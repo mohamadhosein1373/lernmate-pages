@@ -57,11 +57,21 @@ export function TranslationPopup({
           },
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error("Translation invoke error:", error);
+          throw error;
+        }
+        
+        if (data?.error) {
+          console.error("Translation API error:", data.error);
+          setError(data.error);
+          return;
+        }
+        
         setTranslation(data);
       } catch (err: any) {
         console.error("Translation error:", err);
-        setError("Failed to translate. Please try again.");
+        setError(err?.message || "Failed to translate. Please try again.");
       } finally {
         setLoading(false);
       }
