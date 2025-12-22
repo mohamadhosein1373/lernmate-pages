@@ -17,14 +17,16 @@ serve(async (req) => {
       throw new Error("No word provided");
     }
 
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) {
-      throw new Error("GEMINI_API_KEY is not configured");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      throw new Error("LOVABLE_API_KEY is not configured");
     }
 
     console.log("Translating word:", word, "with context:", contextSentence);
 
-    const prompt = `You are a language learning assistant. Translate the following word from English to Persian (Farsi).
+    const systemPrompt = `You are a language learning assistant specialized in translating words and sentences to Persian (Farsi). Provide accurate translations with pronunciation guides.`;
+
+    const userPrompt = `Translate the following word from English/German to Persian (Farsi).
 
 Word: "${word}"
 ${contextSentence ? `Context sentence: "${contextSentence}"` : ""}
@@ -40,41 +42,49 @@ Provide the response in the following JSON format:
 
 Important: Return ONLY valid JSON, no additional text or markdown.`;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: prompt }],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 1024,
-          },
-        }),
-      }
-    );
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+      }),
+    });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error("Gemini API error:", error);
-      throw new Error(`Gemini API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error("AI Gateway error:", response.status, errorText);
+      
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: "AI credits exhausted. Please add credits." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      throw new Error(`AI Gateway error: ${response.status}`);
     }
 
     const data = await response.json();
-    const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const textContent = data.choices?.[0]?.message?.content;
 
     if (!textContent) {
-      throw new Error("No response from Gemini");
+      throw new Error("No response from AI");
     }
 
-    console.log("Gemini response:", textContent);
+    console.log("AI response:", textContent);
 
     // Parse the JSON response
     let translation;
@@ -83,7 +93,7 @@ Important: Return ONLY valid JSON, no additional text or markdown.`;
       const cleanedContent = textContent.replace(/```json\n?|\n?```/g, "").trim();
       translation = JSON.parse(cleanedContent);
     } catch (parseError) {
-      console.error("Failed to parse Gemini response:", parseError);
+      console.error("Failed to parse AI response:", parseError);
       // Fallback response
       translation = {
         wordTranslation: textContent,
