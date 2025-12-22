@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TranslationPopup } from "./TranslationPopup";
+import { PDFViewer } from "./PDFViewer";
 import {
   ArrowLeft,
   ZoomIn,
@@ -45,7 +46,6 @@ export function DocumentReader({ file, onBack }: DocumentReaderProps) {
     const selectedText = selection?.toString().trim();
 
     if (selectedText && selectedText.length > 0 && selectedText.length < 100) {
-      // Get the word
       const word = selectedText.split(/\s+/)[0];
       
       // Try to get surrounding sentence
@@ -61,6 +61,12 @@ export function DocumentReader({ file, onBack }: DocumentReaderProps) {
       setSelectedSentence(sentence.trim());
       setPopupPosition({ x: e.clientX, y: e.clientY });
     }
+  }, []);
+
+  const handlePDFTextSelect = useCallback((word: string, sentence: string, e: React.MouseEvent) => {
+    setSelectedWord(word);
+    setSelectedSentence(sentence);
+    setPopupPosition({ x: e.clientX, y: e.clientY });
   }, []);
 
   const closePopup = () => {
@@ -124,18 +130,13 @@ export function DocumentReader({ file, onBack }: DocumentReaderProps) {
       </div>
 
       {/* Content */}
-      <Card 
-        className="p-8 min-h-[60vh] overflow-auto"
-        onMouseUp={handleTextSelection}
-      >
-        {mimeType === "application/pdf" ? (
-          <div style={{ transform: `scale(${zoom / 100})`, transformOrigin: "top left" }}>
-            <iframe
-              src={`data:application/pdf;base64,${content}`}
-              className="w-full h-[80vh] border-0"
-              title={file.name}
-            />
-          </div>
+      <Card className="p-8 min-h-[60vh] overflow-auto">
+        {mimeType === "application/pdf" && content ? (
+          <PDFViewer
+            base64Content={content}
+            zoom={zoom}
+            onTextSelect={handlePDFTextSelect}
+          />
         ) : (
           <div
             className="prose prose-invert max-w-none select-text"
@@ -143,6 +144,7 @@ export function DocumentReader({ file, onBack }: DocumentReaderProps) {
               fontSize: `${zoom}%`,
               lineHeight: 1.8,
             }}
+            onMouseUp={handleTextSelection}
           >
             <pre className="whitespace-pre-wrap font-sans text-foreground bg-transparent">
               {content}
