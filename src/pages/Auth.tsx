@@ -1,18 +1,103 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Languages, Sparkles } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BookOpen, Languages, Sparkles, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { z } from "zod";
+
+const emailSchema = z.string().email("Please enter a valid email");
+const passwordSchema = z.string().min(6, "Password must be at least 6 characters");
 
 export default function Auth() {
   const { user, loading, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   useEffect(() => {
     if (user && !loading) {
       navigate("/");
     }
   }, [user, loading, navigate]);
+
+  const validateForm = () => {
+    const newErrors: { email?: string; password?: string } = {};
+    
+    try {
+      emailSchema.parse(email);
+    } catch (e) {
+      if (e instanceof z.ZodError) {
+        newErrors.email = e.errors[0].message;
+      }
+    }
+    
+    try {
+      passwordSchema.parse(password);
+    } catch (e) {
+      if (e instanceof z.ZodError) {
+        newErrors.password = e.errors[0].message;
+      }
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+    
+    setIsSubmitting(true);
+    
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/`,
+      },
+    });
+    
+    setIsSubmitting(false);
+    
+    if (error) {
+      if (error.message.includes("already registered")) {
+        toast.error("This email is already registered. Please sign in.");
+      } else {
+        toast.error(error.message);
+      }
+    } else {
+      toast.success("Account created! You can now sign in.");
+    }
+  };
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+    
+    setIsSubmitting(true);
+    
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    
+    setIsSubmitting(false);
+    
+    if (error) {
+      if (error.message.includes("Invalid login")) {
+        toast.error("Invalid email or password");
+      } else {
+        toast.error(error.message);
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -35,58 +120,134 @@ export default function Auth() {
       <div className="flex-1 flex items-center justify-center p-6 relative z-10">
         <div className="w-full max-w-md animate-in-up">
           {/* Logo */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-primary/10 mb-6 gold-glow">
-              <BookOpen className="h-10 w-10 text-primary" />
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4 gold-glow">
+              <BookOpen className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="font-display text-4xl font-medium text-foreground mb-2">
+            <h1 className="font-display text-3xl font-medium text-foreground mb-1">
               LinguFlow
             </h1>
-            <p className="text-muted-foreground text-lg">
+            <p className="text-muted-foreground">
               Learn languages while you read
             </p>
           </div>
 
-          {/* Features */}
-          <div className="space-y-4 mb-10">
-            <div className="flex items-center gap-4 p-4 rounded-xl bg-card/50 border border-border/50">
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Languages className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-medium text-foreground">Instant Translation</h3>
-                <p className="text-sm text-muted-foreground">Tap any word to see its meaning in context</p>
-              </div>
-            </div>
+          {/* Auth Tabs */}
+          <Tabs defaultValue="signin" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="signin">Sign In</TabsTrigger>
+              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="signin">
+              <form onSubmit={handleSignIn} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="signin-email">Email</Label>
+                  <Input
+                    id="signin-email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={isSubmitting}
+                  />
+                  {errors.email && (
+                    <p className="text-sm text-destructive">{errors.email}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="signin-password">Password</Label>
+                  <Input
+                    id="signin-password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isSubmitting}
+                  />
+                  {errors.password && (
+                    <p className="text-sm text-destructive">{errors.password}</p>
+                  )}
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full h-12"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Sign In"
+                  )}
+                </Button>
+              </form>
+            </TabsContent>
+            
+            <TabsContent value="signup">
+              <form onSubmit={handleSignUp} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="signup-email">Email</Label>
+                  <Input
+                    id="signup-email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={isSubmitting}
+                  />
+                  {errors.email && (
+                    <p className="text-sm text-destructive">{errors.email}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="signup-password">Password</Label>
+                  <Input
+                    id="signup-password"
+                    type="password"
+                    placeholder="At least 6 characters"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isSubmitting}
+                  />
+                  {errors.password && (
+                    <p className="text-sm text-destructive">{errors.password}</p>
+                  )}
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full h-12"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Create Account"
+                  )}
+                </Button>
+              </form>
+            </TabsContent>
+          </Tabs>
 
-            <div className="flex items-center gap-4 p-4 rounded-xl bg-card/50 border border-border/50">
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Sparkles className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-medium text-foreground">AI-Powered</h3>
-                <p className="text-sm text-muted-foreground">Context-aware translations with Gemini AI</p>
-              </div>
+          {/* Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-border" />
             </div>
-
-            <div className="flex items-center gap-4 p-4 rounded-xl bg-card/50 border border-border/50">
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <BookOpen className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-medium text-foreground">Your Google Drive</h3>
-                <p className="text-sm text-muted-foreground">Read PDFs and texts directly from your Drive</p>
-              </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Or continue with
+              </span>
             </div>
           </div>
 
-          {/* Sign In Button */}
+          {/* Google Sign In */}
           <Button
             onClick={signInWithGoogle}
+            variant="outline"
             size="lg"
-            className="w-full h-14 text-lg font-medium bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl gold-glow transition-all hover:scale-[1.02]"
+            className="w-full h-12"
           >
-            <svg className="mr-3 h-5 w-5" viewBox="0 0 24 24">
+            <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -107,9 +268,21 @@ export default function Auth() {
             Continue with Google
           </Button>
 
-          <p className="text-center text-sm text-muted-foreground mt-6">
-            By signing in, you agree to give LinguFlow access to your Google Drive files.
+          <p className="text-center text-xs text-muted-foreground mt-6">
+            Note: Google login requires Drive access for file management
           </p>
+
+          {/* Features */}
+          <div className="mt-8 space-y-3">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-card/30 border border-border/30">
+              <Languages className="h-5 w-5 text-primary flex-shrink-0" />
+              <span className="text-sm text-muted-foreground">Instant AI translations</span>
+            </div>
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-card/30 border border-border/30">
+              <Sparkles className="h-5 w-5 text-primary flex-shrink-0" />
+              <span className="text-sm text-muted-foreground">Build vocabulary with context</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
