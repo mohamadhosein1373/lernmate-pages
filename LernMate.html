@@ -1395,6 +1395,7 @@ const reader = {
     },
 
     autoSaveContent() {
+        console.log('AutoSave called - quill:', !!this.quill, 'currentFileId:', this.currentFileId, 'view:', app.view, 'mode:', this.mode);
         if (!this.quill || !this.currentFileId) return;
         if (app.view !== 'reader') return;
         if (this.mode !== 'edit') return;
@@ -1403,7 +1404,9 @@ const reader = {
         if (!file || file.type !== 'text') return;
 
         // Update file content immediately
-        file.content = this.quill.root.innerHTML;
+        const content = this.quill.root.innerHTML;
+        console.log('AutoSaving content:', content);
+        file.content = content;
 
         // Update title if it changed (from the separate title input).
         // If the input is empty and file.title is empty, try to extract a leading <h1> from content.
