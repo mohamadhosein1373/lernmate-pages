@@ -1504,13 +1504,16 @@ const reader = {
             // Clear and reload editor with fresh data
             document.getElementById('editor-title').value = file.title || '';
 
-            // Properly reset Quill
+            // Load content into Quill editor
             if (this.quill) {
-                this.quill.root.innerHTML = file.content || '<p><br></p>';
-                // Force Quill to recognize the new content
+                const contentToLoad = file.content || '<p><br></p>';
+                console.log('Loading into editor:', contentToLoad);
+                
+                // Use Quill's clipboard to properly set HTML content
+                this.quill.clipboard.dangerouslyPasteHTML(0, contentToLoad);
+                
+                // Update the line-height select to reflect the current first-line setting
                 setTimeout(() => {
-                    this.quill.setContents(this.quill.root.innerHTML ? this.quill.getContents() : []);
-                    // Update the line-height select to reflect the current first-line setting
                     const lhSelect = document.getElementById('tb-lineheight');
                     if (lhSelect) {
                         const fmt = this.quill.getFormat(0) || {};
