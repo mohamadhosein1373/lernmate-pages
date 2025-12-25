@@ -68,11 +68,11 @@
         .tb-btn:active { transform: translateY(0) scale(0.98); box-shadow: inset 0 2px 6px rgba(0,0,0,0.1); }
         .tb-btn.ql-active, .tb-btn.active { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border-color: #2563eb; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
         .tb-btn i { font-size: 14px; }
-        .tb-select { height: 36px; line-height: 36px; padding: 0 28px 0 10px; border: 1px solid rgba(148,163,184,0.3); border-radius: 8px; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M2 4l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 10px center; font-size: 13px; cursor: pointer; transition: all 0.15s ease; appearance: none; -webkit-appearance: none; -moz-appearance: none; flex: 0 0 auto; }
+        .tb-select { height: 36px; line-height: 36px; padding: 0 28px 0 10px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(148,163,184,0.3); border-radius: 8px; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M2 4l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 10px center; font-size: 13px; cursor: pointer; transition: all 0.15s ease; appearance: none; -webkit-appearance: none; -moz-appearance: none; flex: 0 0 auto; vertical-align: middle; }}
         .tb-select option { line-height: 1.5; }
         .tb-select:hover { border-color: rgba(59,130,246,0.5); box-shadow: 0 4px 12px rgba(59,130,246,0.1); }
         .tb-color-input { width: 0; height: 0; opacity: 0; position: absolute; pointer-events: none; left: -9999px; top: -9999px; }
-        .tb-color-btn, .tb-highlight-btn { position: relative; }
+        .lh-label { margin-left: 4px; text-align: right; white-space: nowrap; }
         .dark .editor-toolbar { background: linear-gradient(135deg, rgba(30,41,59,0.95), rgba(51,65,85,0.9)); border-color: rgba(71,85,105,0.5); }
         .dark .tb-group { background: rgba(51,65,85,0.6); }
         .dark .tb-btn { background: #1e293b; border-color: rgba(71,85,105,0.5); color: #e2e8f0; }
@@ -376,9 +376,9 @@
 
                             <!-- Line Height -->
                             <span class="tb-group">
-                                <button class="tb-btn tb-lineheight" data-lh="1" title="Line Height 1x"><i class="fas fa-arrows-alt-v"></i> 1x</button>
-                                <button class="tb-btn tb-lineheight" data-lh="1.5" title="Line Height 1.5x"><i class="fas fa-arrows-alt-v"></i> 1.5x</button>
-                                <button class="tb-btn tb-lineheight" data-lh="2" title="Line Height 2x"><i class="fas fa-arrows-alt-v"></i> 2x</button>
+                                <button class="tb-btn tb-lineheight" data-lh="1" title="Line Height 1x"><i class="fas fa-arrows-alt-v"></i><span class="lh-label">1x</span></button>
+                                <button class="tb-btn tb-lineheight" data-lh="1.5" title="Line Height 1.5x"><i class="fas fa-arrows-alt-v"></i><span class="lh-label">1.5x</span></button>
+                                <button class="tb-btn tb-lineheight" data-lh="2" title="Line Height 2x"><i class="fas fa-arrows-alt-v"></i><span class="lh-label">2x</span></button>
                             </span>
 
                             <!-- Lists -->
@@ -387,9 +387,10 @@
                                 <button class="ql-list tb-btn" value="ordered" title="Numbered List"><i class="fas fa-list-ol"></i></button>
                             </span>
 
-                            <!-- Direction (single toggle) -->
+                            <!-- Direction: LTR and RTL -->
                             <span class="tb-group">
-                                <button class="tb-btn tb-direction" title="Toggle RTL/LTR"><i class="fas fa-exchange-alt"></i></button>
+                                <button class="tb-btn tb-direction" data-dir="ltr" title="Left-to-Right"><i class="fas fa-align-left"></i></button>
+                                <button class="tb-btn tb-direction" data-dir="rtl" title="Right-to-Left"><i class="fas fa-align-right"></i></button>
                             </span>
 
                             <!-- Image -->
@@ -1221,25 +1222,26 @@ const reader = {
             });
         });
 
-        // Direction toggle (RTL/LTR)
-        const dirBtn = toolbar.querySelector('.tb-direction');
-        if (dirBtn) {
-            dirBtn.addEventListener('click', () => {
+        // Direction buttons (LTR and RTL)
+        toolbar.querySelectorAll('.tb-direction').forEach(btn => {
+            btn.addEventListener('click', () => {
                 this.quill.focus();
+                const dir = btn.dataset.dir; // 'ltr' or 'rtl'
                 const range = this.quill.getSelection(true);
-                if (!range) return;
-                const format = this.quill.getFormat(range);
-                const currentDir = format.direction || 'ltr';
-                const nextDir = currentDir === 'rtl' ? 'ltr' : 'rtl';
-                this.quill.format('direction', nextDir);
-                // Align accordingly
-                if (nextDir === 'rtl') {
-                    this.quill.format('align', 'right');
-                } else {
-                    this.quill.format('align', false);
+                if (range) {
+                    this.quill.format('direction', dir);
+                    // Adjust alignment based on direction
+                    if (dir === 'rtl') {
+                        this.quill.format('align', 'right');
+                    } else {
+                        this.quill.format('align', false); // default left
+                    }
+                    // Update button states
+                    toolbar.querySelectorAll('.tb-direction').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
                 }
             });
-        }
+        });
 
         // Text Color picker
         const colorBtn = toolbar.querySelector('.tb-color-btn');
