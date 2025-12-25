@@ -70,7 +70,8 @@
         #read-layer h1 { font-size: 2.25rem; font-weight: bold; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; }
         
         /* Quill alignment styles */
-        .ql-editor.ql-blank::before { color: #999; }
+        .ql-editor.ql-blank::before { color: #999; font-style: italic; opacity: 0.6; }
+        .ql-editor:focus.ql-blank::before { opacity: 0.4; }
         .ql-editor { text-align: left; }
         .ql-editor [style*="text-align: center"] { text-align: center !important; }
         .ql-editor [style*="text-align: right"] { text-align: right !important; }
@@ -1394,7 +1395,9 @@ const reader = {
     },
 
     autoSaveContent() {
-        if (!this.quill || !this.currentFileId || app.view !== 'reader' || reader.mode !== 'edit') return;
+        if (!this.quill || !this.currentFileId) return;
+        if (app.view !== 'reader') return;
+        if (this.mode !== 'edit') return;
 
         const file = app.files.find(f => f.id === this.currentFileId);
         if (!file || file.type !== 'text') return;
@@ -1446,7 +1449,15 @@ const reader = {
             btnRead.classList.remove('text-gray-500', 'dark:text-gray-400');
 
             // Ensure we have saved any changes first
-            this.saveContent();
+            if (this.mode === 'edit' && this.quill) {
+                file.content = this.quill.root.innerHTML;
+                const titleInput = document.getElementById('editor-title');
+                if (titleInput) {
+                    file.title = titleInput.value.trim();
+                }
+                file.lastEdited = Date.now();
+                app.save();
+            }
 
             // Determine display title: prefer explicit file.title (if set and different from filename).
             // If not available, try to extract a leading <h1> from the content. Never use filename as title.
