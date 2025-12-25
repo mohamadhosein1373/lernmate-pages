@@ -1352,14 +1352,19 @@ const reader = {
         // Store the file ID locally
         this.currentFileId = file.id;
         app.currentFileId = file.id;
-            document.getElementById('page-title').innerText = (file.title && file.title.trim()) ? file.title : '';
+        document.getElementById('page-title').innerText = (file.title && file.title.trim()) ? file.title : '';
 
         const readDiv = document.getElementById('read-layer');
         const editDiv = document.getElementById('edit-layer');
-        readDiv.innerHTML = '';
+        
+        // Don't clear readDiv here - let setMode handle it
         editDiv.style.display = 'none';
 
         if (file.type === 'text') {
+            // Ensure content is available before switching mode
+            if (!file.content || file.content.trim() === '') {
+                file.content = '<p><br></p>';
+            }
             this.setMode('read');
         } else {
             readDiv.innerHTML = '<div class="flex justify-center py-8"><div class="loader"></div></div>';
