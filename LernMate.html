@@ -59,14 +59,18 @@
         .ql-font-nunito { font-family: 'Nunito', sans-serif; }
 
         /* Rich toolbar styling */
-        .editor-toolbar { position: sticky; top: 0; z-index: 100; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 14px; margin-bottom: 14px; border-radius: 16px; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(241,245,249,0.9)); border: 1px solid rgba(148,163,184,0.3); box-shadow: 0 8px 32px rgba(15,23,42,0.1); backdrop-filter: blur(8px); }
-        .tb-group { display: inline-flex; align-items: center; gap: 4px; padding: 4px 6px; background: rgba(241,245,249,0.6); border-radius: 10px; }
-        .tb-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-width: 36px; height: 36px; background: #fff; border: 1px solid rgba(148,163,184,0.3); border-radius: 8px; font-size: 13px; font-weight: 500; color: #374151; cursor: pointer; transition: all 0.18s cubic-bezier(0.4,0,0.2,1); }
+        .editor-toolbar { position: sticky; top: 0; z-index: 100; display: flex; flex-wrap: nowrap; align-items: center; gap: 10px; padding: 12px 14px; margin-bottom: 22px; border-radius: 16px; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(241,245,249,0.9)); border: 1px solid rgba(148,163,184,0.3); box-shadow: 0 8px 32px rgba(15,23,42,0.1); backdrop-filter: blur(8px); overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; max-width: 100%; box-sizing: border-box; }
+        .editor-toolbar::-webkit-scrollbar { height: 6px; }
+        .editor-toolbar::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.5); border-radius: 3px; }
+        .editor-toolbar::-webkit-scrollbar-track { background: transparent; }
+        .tb-group { display: inline-flex; align-items: center; gap: 8px; padding: 4px 6px; background: rgba(241,245,249,0.6); border-radius: 10px; margin-right: 4px; flex: 0 0 auto; }
+        .tb-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-width: 36px; height: 36px; line-height: 1; background: #fff; border: 1px solid rgba(148,163,184,0.3); border-radius: 8px; font-size: 13px; font-weight: 500; color: #374151; cursor: pointer; transition: all 0.18s cubic-bezier(0.4,0,0.2,1); box-sizing: border-box; flex: 0 0 auto; }
         .tb-btn:hover { transform: translateY(-2px) scale(1.04); box-shadow: 0 6px 20px rgba(59,130,246,0.18); background: linear-gradient(135deg, #fff, #f0f9ff); border-color: rgba(59,130,246,0.4); }
         .tb-btn:active { transform: translateY(0) scale(0.98); box-shadow: inset 0 2px 6px rgba(0,0,0,0.1); }
         .tb-btn.ql-active, .tb-btn.active { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border-color: #2563eb; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
         .tb-btn i { font-size: 14px; }
-        .tb-select { height: 36px; padding: 0 28px 0 10px; border: 1px solid rgba(148,163,184,0.3); border-radius: 8px; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M2 4l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 10px center; font-size: 13px; cursor: pointer; transition: all 0.15s ease; appearance: none; }
+        .tb-select { height: 36px; line-height: 36px; padding: 0 28px 0 10px; border: 1px solid rgba(148,163,184,0.3); border-radius: 8px; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M2 4l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 10px center; font-size: 13px; cursor: pointer; transition: all 0.15s ease; appearance: none; -webkit-appearance: none; -moz-appearance: none; flex: 0 0 auto; }
+        .tb-select option { line-height: 1.5; }
         .tb-select:hover { border-color: rgba(59,130,246,0.5); box-shadow: 0 4px 12px rgba(59,130,246,0.1); }
         .tb-color-input { width: 0; height: 0; opacity: 0; position: absolute; pointer-events: none; }
         .tb-color-btn, .tb-highlight-btn { position: relative; }
@@ -75,6 +79,11 @@
         .dark .tb-btn { background: #1e293b; border-color: rgba(71,85,105,0.5); color: #e2e8f0; }
         .dark .tb-btn:hover { background: linear-gradient(135deg, #334155, #475569); border-color: rgba(59,130,246,0.5); }
         .dark .tb-select { background-color: #1e293b; color: #e2e8f0; border-color: rgba(71,85,105,0.5); }
+
+        /* If very narrow, allow wrap with bigger row gap */
+        @media (max-width: 900px) {
+            .editor-toolbar { flex-wrap: wrap; row-gap: 14px; }
+        }
 
         #edit-layer .ql-toolbar { display: block !important; background: transparent; border: none !important; padding: 0; margin: 0; }
         #edit-layer .ql-editor { min-height: calc(100vh - 360px); font-size: 16px; padding: 0; }
@@ -357,18 +366,22 @@
                             <button class="ql-align tb-btn" value="justify" title="Justify"><i class="fas fa-align-justify"></i></button>
                         </span>
 
-                        <!-- Justify Levels: Low / Medium / High -->
+                        <!-- Justify Levels (dropdown) -->
                         <span class="tb-group">
-                            <button class="tb-btn tb-justify-level" data-level="low" title="Justify Low"><i class="fas fa-text-width"></i> L</button>
-                            <button class="tb-btn tb-justify-level" data-level="medium" title="Justify Medium"><i class="fas fa-text-width"></i> M</button>
-                            <button class="tb-btn tb-justify-level" data-level="high" title="Justify High"><i class="fas fa-text-width"></i> H</button>
+                            <select class="tb-select tb-justify-select" title="Justify Level">
+                                <option value="low">Justify L</option>
+                                <option value="medium" selected>Justify M</option>
+                                <option value="high">Justify H</option>
+                            </select>
                         </span>
 
-                        <!-- Line Height -->
+                        <!-- Line Height (dropdown) -->
                         <span class="tb-group">
-                            <button class="tb-btn tb-lineheight" data-lh="1" title="Line Height 1x"><i class="fas fa-arrows-alt-v"></i> 1x</button>
-                            <button class="tb-btn tb-lineheight" data-lh="1.5" title="Line Height 1.5x"><i class="fas fa-arrows-alt-v"></i> 1.5x</button>
-                            <button class="tb-btn tb-lineheight" data-lh="2" title="Line Height 2x"><i class="fas fa-arrows-alt-v"></i> 2x</button>
+                            <select class="tb-select tb-lineheight-select" title="Line Height">
+                                <option value="1">1x</option>
+                                <option value="1.5" selected>1.5x</option>
+                                <option value="2">2x</option>
+                            </select>
                         </span>
 
                         <!-- Lists -->
@@ -1182,46 +1195,51 @@ const reader = {
         const toolbar = document.getElementById('editor-toolbar');
         if (!toolbar) return;
 
-        // Line Height buttons
-        toolbar.querySelectorAll('.tb-lineheight').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const lh = btn.dataset.lh;
-                const range = this.quill.getSelection();
-                if (range) {
-                    this.quill.format('lineheight', lh);
-                }
-                // Toggle active state
-                toolbar.querySelectorAll('.tb-lineheight').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
+        // Line Height (dropdown)
+        const lhSelect = toolbar.querySelector('.tb-lineheight-select');
+        if (lhSelect) {
+            lhSelect.addEventListener('change', (e) => {
+                this.quill.focus();
+                const lh = e.target.value;
+                const range = this.quill.getSelection(true);
+                if (range) this.quill.format('lineheight', lh);
             });
-        });
+        }
 
-        // Justify Levels (word-spacing)
-        toolbar.querySelectorAll('.tb-justify-level').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const level = btn.dataset.level;
+        // Justify Level (dropdown) -> sets align=justify + word-spacing
+        const justifySelect = toolbar.querySelector('.tb-justify-select');
+        if (justifySelect) {
+            justifySelect.addEventListener('change', (e) => {
+                this.quill.focus();
+                const level = e.target.value;
                 const spacing = level === 'low' ? '0px' : level === 'medium' ? '2px' : '5px';
-                const range = this.quill.getSelection();
+                const range = this.quill.getSelection(true);
                 if (range) {
-                    // First set justify alignment
                     this.quill.format('align', 'justify');
-                    // Then set word-spacing
                     this.quill.format('wordspacing', spacing);
                 }
-                toolbar.querySelectorAll('.tb-justify-level').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
             });
-        });
+        }
 
         // Direction toggle (RTL/LTR)
-        toolbar.querySelector('.tb-direction').addEventListener('click', () => {
-            const range = this.quill.getSelection();
-            if (range) {
+        const dirBtn = toolbar.querySelector('.tb-direction');
+        if (dirBtn) {
+            dirBtn.addEventListener('click', () => {
+                this.quill.focus();
+                const range = this.quill.getSelection(true);
+                if (!range) return;
                 const format = this.quill.getFormat(range);
                 const currentDir = format.direction || 'ltr';
-                this.quill.format('direction', currentDir === 'rtl' ? 'ltr' : 'rtl');
-            }
-        });
+                const nextDir = currentDir === 'rtl' ? 'ltr' : 'rtl';
+                this.quill.format('direction', nextDir);
+                // Align accordingly
+                if (nextDir === 'rtl') {
+                    this.quill.format('align', 'right');
+                } else {
+                    this.quill.format('align', false); // remove align to default left
+                }
+            });
+        }
 
         // Text Color picker
         const colorBtn = toolbar.querySelector('.tb-color-btn');
