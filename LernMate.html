@@ -1432,7 +1432,6 @@ const reader = {
     },
 
     setMode(m) {
-        this.mode = m;
         const readLayer = document.getElementById('read-layer');
         const editLayer = document.getElementById('edit-layer');
         const btnRead = document.getElementById('btn-read');
@@ -1448,8 +1447,8 @@ const reader = {
             btnRead.classList.add('bg-white', 'dark:bg-gray-700', 'shadow-sm');
             btnRead.classList.remove('text-gray-500', 'dark:text-gray-400');
 
-            // Ensure we have saved any changes first
-            if (this.mode === 'edit' && this.quill) {
+            // ALWAYS save content when switching to read (regardless of previous mode)
+            if (this.quill) {
                 file.content = this.quill.root.innerHTML;
                 const titleInput = document.getElementById('editor-title');
                 if (titleInput) {
@@ -1458,6 +1457,9 @@ const reader = {
                 file.lastEdited = Date.now();
                 app.save();
             }
+            
+            // Now update mode
+            this.mode = m;
 
             // Determine display title: prefer explicit file.title (if set and different from filename).
             // If not available, try to extract a leading <h1> from the content. Never use filename as title.
@@ -1481,11 +1483,15 @@ const reader = {
             editLayer.style.display = 'none';
             readLayer.style.display = 'block';
         } else {
+            // Switching to edit mode
             if (file.type === 'pdf') {
                 alert("ویرایش فایل PDF پشتیبانی نمی‌شود.");
                 this.setMode('read');
                 return;
             }
+
+            // Update mode first
+            this.mode = m;
 
             btnEdit.classList.add('bg-white', 'dark:bg-gray-700', 'shadow-sm');
             btnEdit.classList.remove('text-gray-500', 'dark:text-gray-400');
