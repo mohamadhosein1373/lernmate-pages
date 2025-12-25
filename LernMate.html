@@ -19,8 +19,8 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- TinyMCE Rich Text Editor -->
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <!-- CKEditor 5 Rich Text Editor (Free, no API key needed) -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -46,31 +46,21 @@
         
         #reader-container { height: calc(100vh - 80px); overflow-y: scroll; scroll-behavior: smooth; padding-bottom: 100px; }
 
-        .ql-font-inter { font-family: 'Inter', sans-serif; }
-        .ql-font-lato { font-family: 'Lato', sans-serif; }
-        .ql-font-montserrat { font-family: 'Montserrat', sans-serif; }
-        .ql-font-roboto { font-family: 'Roboto', sans-serif; }
-        .ql-font-open_sans { font-family: 'Open Sans', sans-serif; }
-        .ql-font-merriweather { font-family: 'Merriweather', serif; }
-        .ql-font-poppins { font-family: 'Poppins', sans-serif; }
-        .ql-font-raleway { font-family: 'Raleway', sans-serif; }
-        .ql-font-source-sans-3 { font-family: 'Source Sans 3', sans-serif; }
-        .ql-font-nunito { font-family: 'Nunito', sans-serif; }
-
-        /* TinyMCE Editor Styling */
-        .tox-tinymce { border-radius: 14px !important; border: 1px solid rgba(148,163,184,0.35) !important; box-shadow: 0 10px 30px rgba(15,23,42,0.06) !important; }
-        .tox .tox-toolbar { background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(241,245,249,0.95)) !important; border-bottom: 1px solid rgba(148,163,184,0.2) !important; }
-        .tox .tox-toolbar__group { border-color: rgba(148,163,184,0.3) !important; }
-        .tox .tox-tbtn { border-radius: 6px !important; margin: 2px !important; }
-        .tox .tox-tbtn:hover { background: rgba(59,130,246,0.1) !important; }
-        .tox .tox-tbtn--enabled, .tox .tox-tbtn--enabled:hover { background: linear-gradient(135deg, #3b82f6, #2563eb) !important; color: #fff !important; }
-        .tox .tox-edit-area__iframe { background: #fff !important; }
-        .tox .tox-statusbar { display: none !important; }
-        .dark .tox-tinymce { border-color: rgba(71,85,105,0.5) !important; }
-        .dark .tox .tox-toolbar { background: linear-gradient(135deg, rgba(30,41,59,0.98), rgba(51,65,85,0.95)) !important; }
-        .dark .tox .tox-tbtn { color: #e2e8f0 !important; }
-        .dark .tox .tox-tbtn svg { fill: #e2e8f0 !important; }
-        .dark .tox .tox-edit-area__iframe { background: #1e293b !important; }
+        /* CKEditor 5 Styling */
+        .ck.ck-editor { border-radius: 14px !important; overflow: hidden; box-shadow: 0 10px 30px rgba(15,23,42,0.06); }
+        .ck.ck-editor__main>.ck-editor__editable { min-height: 350px; font-family: 'Inter', sans-serif; font-size: 16px; padding: 18px 22px; }
+        .ck.ck-toolbar { background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(241,245,249,0.95)) !important; border-bottom: 1px solid rgba(148,163,184,0.2) !important; padding: 8px !important; }
+        .ck.ck-button { border-radius: 6px !important; }
+        .ck.ck-button:hover { background: rgba(59,130,246,0.1) !important; }
+        .ck.ck-button.ck-on { background: linear-gradient(135deg, #3b82f6, #2563eb) !important; color: #fff !important; }
+        .ck.ck-editor__editable:not(.ck-editor__nested-editable).ck-focused { border-color: rgba(59,130,246,0.5) !important; box-shadow: 0 0 0 3px rgba(59,130,246,0.1) !important; }
+        .dark .ck.ck-editor__main>.ck-editor__editable { background: #1e293b !important; color: #e2e8f0 !important; }
+        .dark .ck.ck-toolbar { background: linear-gradient(135deg, rgba(30,41,59,0.98), rgba(51,65,85,0.95)) !important; }
+        .dark .ck.ck-button { color: #e2e8f0 !important; }
+        .dark .ck.ck-icon { color: #e2e8f0 !important; }
+        #read-layer { max-width: 800px; margin: 0 auto; padding: 2rem; }
+        #read-layer h1 { font-size: 2.25rem; font-weight: bold; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; }
+        .dark #read-layer h1 { border-bottom-color: #334155; }
     </style>
 </head>
 
@@ -211,7 +201,7 @@
                 <div id="read-layer" class="p-6"></div>
                 <div id="edit-layer" class="max-w-3xl mx-auto p-4 md:p-6" style="display: none;">
                     <input type="text" id="editor-title" placeholder="Note Title..." class="w-full text-2xl lg:text-3xl font-bold bg-transparent outline-none mb-4 pb-2 border-b dark:border-dark-border dark:text-white placeholder-gray-400 dark:placeholder-gray-600">
-                    <textarea id="tinymce-editor"></textarea>
+                    <div id="ckeditor-container"></div>
                 </div>
             </div>
         </div>
@@ -955,54 +945,38 @@ const reader = {
 
     initEditor() {
         if (this.editor) return;
-
-        const isDark = document.documentElement.classList.contains('dark');
         
-        tinymce.init({
-            selector: '#tinymce-editor',
-            height: 450,
-            menubar: false,
-            directionality: 'ltr',
-            plugins: 'lists image directionality',
-            toolbar: 'fontfamily fontsize | bold italic underline | forecolor backcolor | alignleft aligncenter alignright alignjustify | lineheight | bullist numlist | ltr rtl | image',
-            font_family_formats: 'Inter=Inter,sans-serif; Lato=Lato,sans-serif; Montserrat=Montserrat,sans-serif; Roboto=Roboto,sans-serif; Open Sans=Open Sans,sans-serif; Merriweather=Merriweather,serif; Poppins=Poppins,sans-serif; Raleway=Raleway,sans-serif; Source Sans 3=Source Sans 3,sans-serif; Nunito=Nunito,sans-serif',
-            font_size_formats: '12px 14px 16px 18px 24px 32px',
-            line_height_formats: '1 1.5 2',
-            content_style: `
-                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-                @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
-                @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
-                @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-                @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
-                @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap');
-                @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
-                @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600&display=swap');
-                @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600&display=swap');
-                @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600&display=swap');
-                body { font-family: Inter, sans-serif; font-size: 16px; padding: 18px 22px; direction: ltr; }
-                p { margin: 10px 0; }
-                ul, ol { padding-left: 1.5em; }
-                [dir="rtl"] ul, [dir="rtl"] ol { padding-left: 0; padding-right: 1.5em; }
-            `,
-            skin: isDark ? 'oxide-dark' : 'oxide',
-            content_css: isDark ? 'dark' : 'default',
-            promotion: false,
-            branding: false,
-            setup: (editor) => {
+        ClassicEditor
+            .create(document.querySelector('#ckeditor-container'), {
+                toolbar: [
+                    'heading', '|',
+                    'bold', 'italic', 'underline', '|',
+                    'fontColor', 'fontBackgroundColor', '|',
+                    'alignment', '|',
+                    'bulletedList', 'numberedList', '|',
+                    'outdent', 'indent', '|',
+                    'undo', 'redo'
+                ],
+                language: 'en',
+                placeholder: 'Start writing...'
+            })
+            .then(editor => {
                 this.editor = editor;
                 
                 // Auto-save on content change
                 let saveTimeout;
-                editor.on('input change', () => {
+                editor.model.document.on('change:data', () => {
                     clearTimeout(saveTimeout);
                     saveTimeout = setTimeout(() => {
                         this.saveCurrentFile();
                     }, 500);
                 });
                 
-                console.log('TinyMCE initialized');
-            }
-        });
+                console.log('CKEditor initialized');
+            })
+            .catch(error => {
+                console.error('CKEditor init error:', error);
+            });
     },
 
     saveCurrentFile() {
@@ -1011,8 +985,8 @@ const reader = {
         const file = app.files.find(f => f.id === this.currentFileId);
         if (!file || file.type !== 'text') return;
 
-        // Get content from TinyMCE
-        const content = this.editor.getContent();
+        // Get content from CKEditor
+        const content = this.editor.getData();
         console.log('Saving file content:', content);
         
         // Save content
@@ -1087,11 +1061,11 @@ const reader = {
             // Set title
             document.getElementById('editor-title').value = file.title || '';
 
-            // Set TinyMCE content
+            // Set CKEditor content
             if (this.editor) {
                 const content = file.content || '';
-                this.editor.setContent(content);
-                console.log('Loaded into TinyMCE:', content);
+                this.editor.setData(content);
+                console.log('Loaded into CKEditor:', content);
             }
 
             readLayer.style.display = 'none';
