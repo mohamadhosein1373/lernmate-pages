@@ -50,17 +50,17 @@
         #reader-container { height: calc(100vh - 80px); overflow-y: scroll; scroll-behavior: smooth; padding-bottom: 100px; }
 
         /* CKEditor 5 Decoupled Document Styling */
-        #ckeditor-toolbar { border-radius: 14px 14px 0 0; overflow: visible; background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(241,245,249,0.95)); border: 1px solid rgba(148,163,184,0.35); border-bottom: none; position: relative; z-index: 100; }
-        #ckeditor-toolbar .ck-toolbar { border: none !important; background: transparent !important; padding: 8px !important; flex-wrap: nowrap !important; overflow-x: auto !important; }
-        .ck-editor-container { border: 1px solid rgba(148,163,184,0.35); border-radius: 0 0 14px 14px; overflow: visible; box-shadow: 0 10px 30px rgba(15,23,42,0.06); background: #fff; position: relative; z-index: 1; }
+        #ckeditor-toolbar { border-radius: 14px; overflow: visible; background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(241,245,249,0.95)); border: 1px solid rgba(148,163,184,0.35); position: relative; z-index: 1000; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(15,23,42,0.08); }
+        #ckeditor-toolbar .ck-toolbar { border: none !important; background: transparent !important; padding: 10px 12px !important; flex-wrap: nowrap !important; overflow-x: auto !important; }
+        .ck-editor-container { border: 1px solid rgba(148,163,184,0.35); border-radius: 14px; overflow: hidden; box-shadow: 0 10px 30px rgba(15,23,42,0.06); background: #fff; position: relative; z-index: 1; }
         .ck-editor-container .ck-editor__editable { min-height: 350px; font-family: 'Inter', sans-serif; font-size: 16px; padding: 18px 22px !important; border: none !important; outline: none !important; box-shadow: none !important; }
         .ck-editor-container .ck-editor__editable:focus { border: none !important; outline: none !important; box-shadow: none !important; }
         .ck.ck-button { border-radius: 6px !important; }
         .ck.ck-button:hover { background: rgba(59,130,246,0.1) !important; }
         .ck.ck-button.ck-on { background: linear-gradient(135deg, #3b82f6, #2563eb) !important; color: #fff !important; }
-        .ck.ck-dropdown__panel { border-radius: 8px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important; z-index: 9999 !important; }
+        .ck.ck-dropdown__panel { border-radius: 8px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important; z-index: 99999 !important; position: absolute !important; }
         .ck.ck-dropdown { position: relative !important; }
-        .ck.ck-dropdown .ck-dropdown__panel { position: absolute !important; z-index: 9999 !important; }
+        .ck-dropdown__panel.ck-dropdown__panel_se { top: 100% !important; }
         .dark #ckeditor-toolbar { background: linear-gradient(135deg, rgba(30,41,59,0.98), rgba(51,65,85,0.95)); border-color: rgba(71,85,105,0.5); }
         .dark .ck-editor-container { background: #1e293b; border-color: rgba(71,85,105,0.5); }
         .dark .ck-editor-container .ck-editor__editable { background: #1e293b !important; color: #e2e8f0 !important; }
@@ -211,7 +211,13 @@
                 <div id="read-layer" class="p-6"></div>
                 <div id="edit-layer" class="max-w-3xl mx-auto p-4 md:p-6" style="display: none;">
                     <input type="text" id="editor-title" placeholder="Note Title..." class="w-full text-2xl lg:text-3xl font-bold bg-transparent outline-none mb-4 pb-2 border-b dark:border-dark-border dark:text-white placeholder-gray-400 dark:placeholder-gray-600">
-                    <div id="ckeditor-toolbar"></div>
+                    <div id="ckeditor-toolbar-wrapper" style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
+                        <div id="ckeditor-toolbar" style="flex: 1;"></div>
+                        <div id="direction-buttons" style="display: flex; gap: 4px; padding: 6px; background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(241,245,249,0.95)); border: 1px solid rgba(148,163,184,0.35); border-radius: 10px;">
+                            <button onclick="reader.setDirection('ltr')" class="dir-btn" data-dir="ltr" title="Left to Right" style="padding: 8px 12px; border-radius: 6px; border: none; background: #3b82f6; color: white; font-weight: 600; font-size: 12px; cursor: pointer;">LTR</button>
+                            <button onclick="reader.setDirection('rtl')" class="dir-btn" data-dir="rtl" title="Right to Left" style="padding: 8px 12px; border-radius: 6px; border: none; background: #e2e8f0; color: #475569; font-weight: 600; font-size: 12px; cursor: pointer;">RTL</button>
+                        </div>
+                    </div>
                     <div id="ckeditor-container" class="ck-editor-container"></div>
                 </div>
             </div>
@@ -1015,6 +1021,27 @@ const reader = {
             .catch(error => {
                 console.error('CKEditor init error:', error);
             });
+    },
+
+    setDirection(dir) {
+        if (!this.editor) return;
+        
+        const editable = document.querySelector('.ck-editor__editable');
+        if (editable) {
+            editable.style.direction = dir;
+            editable.style.textAlign = dir === 'rtl' ? 'right' : 'left';
+        }
+        
+        // Update button states
+        document.querySelectorAll('.dir-btn').forEach(btn => {
+            if (btn.dataset.dir === dir) {
+                btn.style.background = '#3b82f6';
+                btn.style.color = 'white';
+            } else {
+                btn.style.background = '#e2e8f0';
+                btn.style.color = '#475569';
+            }
+        });
     },
 
     saveCurrentFile() {
