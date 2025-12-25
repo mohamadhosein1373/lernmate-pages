@@ -1154,7 +1154,7 @@ const reader = {
             modules: {
                 toolbar: false
             },
-            placeholder: 'Start writing your amazing note...',
+            placeholder: '',
             theme: 'snow'
         });
 
@@ -1450,6 +1450,7 @@ const reader = {
             // ALWAYS save content when switching to read (regardless of previous mode)
             if (this.quill) {
                 file.content = this.quill.root.innerHTML;
+                console.log('Saving content to file:', file.content);
                 const titleInput = document.getElementById('editor-title');
                 if (titleInput) {
                     file.title = titleInput.value.trim();
@@ -1465,6 +1466,7 @@ const reader = {
             // If not available, try to extract a leading <h1> from the content. Never use filename as title.
             let displayTitle = '';
             let contentToShow = file.content || '';
+            console.log('Content to show in read mode:', contentToShow);
             if (file.title && file.title.trim() && file.title !== file.name) {
                 displayTitle = file.title.trim();
             } else {
