@@ -126,26 +126,23 @@
         .ql-container.ql-snow { border: 1px solid rgba(148,163,184,0.35); border-radius: 12px; }
 
         #editor-quill { min-height: 320px; border: 1px solid rgba(148,163,184,0.35); border-radius: 14px; background: #fff; box-shadow: 0 10px 30px rgba(15,23,42,0.06); }
-        #editor-quill .ql-editor { padding: 18px 22px; min-height: 300px; }
-        #editor-quill.ql-editor p { margin: 10px 0; }
-        #editor-quill.ql-editor > * { margin-bottom: 10px; }
+        #editor-quill .ql-editor { padding: 18px 22px; min-height: 300px; direction: ltr; text-align: left; }
+        #editor-quill .ql-editor p { margin: 10px 0; }
+        #editor-quill .ql-editor > * { margin-bottom: 10px; }
         
         /* Alignment in editor */
-        #editor-quill.ql-editor { text-align: left; }
-        #editor-quill.ql-editor.ql-align-center, 
-        #editor-quill.ql-editor p[style*="text-align: center"] { text-align: center !important; }
-        #editor-quill.ql-editor.ql-align-right,
-        #editor-quill.ql-editor p[style*="text-align: right"] { text-align: right !important; }
-        #editor-quill.ql-editor.ql-align-justify,
-        #editor-quill.ql-editor p[style*="text-align: justify"] { text-align: justify !important; }
+        #editor-quill .ql-editor .ql-align-center { text-align: center !important; }
+        #editor-quill .ql-editor .ql-align-right { text-align: right !important; }
+        #editor-quill .ql-editor .ql-align-justify { text-align: justify !important; }
         
-        /* Support for attribute-based alignment */
-        #editor-quill.ql-editor [data-align="center"] { text-align: center !important; }
-        #editor-quill.ql-editor [data-align="right"] { text-align: right !important; }
-        #editor-quill.ql-editor [data-align="justify"] { text-align: justify !important; }
+        /* Direction in editor - LTR default, RTL when specified */
+        #editor-quill .ql-editor .ql-direction-rtl { direction: rtl; text-align: right; }
+        #editor-quill .ql-editor li.ql-direction-rtl { padding-right: 1.5em; padding-left: 0; }
+        #editor-quill .ql-editor li:not(.ql-direction-rtl) { padding-left: 1.5em; padding-right: 0; }
         
-        /* Default alignment */
-        #editor-quill.ql-editor p, #editor-quill.ql-editor li { text-align: left; }
+        /* Default alignment for lists */
+        #editor-quill .ql-editor ol, #editor-quill .ql-editor ul { padding-left: 1.5em; padding-right: 0; direction: ltr; }
+        #editor-quill .ql-editor ol.ql-direction-rtl, #editor-quill .ql-editor ul.ql-direction-rtl { padding-right: 1.5em; padding-left: 0; direction: rtl; }
         
         #edit-layer .ql-toolbar { overflow: visible !important; }
         /* Force native select options to be readable */
@@ -399,7 +396,7 @@
                             </span>
                         </div>
                     </div>
-                    <div id="editor-quill" style="background: #fff;"></div>
+                    <div id="editor-quill" dir="ltr" style="background: #fff;"></div>
                 </div>
             </div>
         </div>
