@@ -1169,13 +1169,29 @@ const reader = {
 
                 let sentence = '';
                 if (selection.anchorNode) {
+                    // Find nearest text-holding block element
                     let element = selection.anchorNode.nodeType === 3 
                         ? selection.anchorNode.parentElement 
                         : selection.anchorNode;
-                    
-                    while (element && !sentence) {
+
+                    while (element) {
                         if (element.matches && element.matches('p, div, li, h1, h2, h3, h4, h5, h6, span')) {
-                            sentence = element.textContent;
+                            const blockText = element.textContent || '';
+                            const range = selection.getRangeAt(0);
+
+                            // Compute character index of selection start within the block
+                            const preRange = document.createRange();
+                            preRange.setStart(element, 0);
+                            preRange.setEnd(range.startContainer, range.startOffset);
+                            const startIndex = preRange.toString().length;
+
+                            const dotBefore = blockText.lastIndexOf('.', startIndex);
+                            const dotAfter = blockText.indexOf('.', startIndex + selectedText.length);
+
+                            const sentenceStart = dotBefore === -1 ? 0 : dotBefore + 1;
+                            const sentenceEnd = dotAfter === -1 ? blockText.length : dotAfter + 1;
+
+                            sentence = blockText.slice(sentenceStart, sentenceEnd).trim();
                             break;
                         }
                         element = element.parentElement;
