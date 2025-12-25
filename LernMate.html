@@ -1452,7 +1452,12 @@ const reader = {
 
             // ALWAYS save content when switching to read (regardless of previous mode)
             if (this.quill) {
-                file.content = this.quill.root.innerHTML;
+                const quillHTML = this.quill.root.innerHTML;
+                console.log('Quill root innerHTML:', quillHTML);
+                console.log('Quill getText:', this.quill.getText());
+                console.log('Quill getContents:', JSON.stringify(this.quill.getContents()));
+                
+                file.content = quillHTML;
                 console.log('Saving content to file:', file.content);
                 const titleInput = document.getElementById('editor-title');
                 if (titleInput) {
