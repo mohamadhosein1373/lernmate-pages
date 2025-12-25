@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- CKEditor 5 Full Build (Free, no API key needed) -->
-    <script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/super-build/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/decoupled-document/ckeditor.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -46,18 +46,23 @@
         
         #reader-container { height: calc(100vh - 80px); overflow-y: scroll; scroll-behavior: smooth; padding-bottom: 100px; }
 
-        /* CKEditor 5 Styling */
-        .ck.ck-editor { border-radius: 14px !important; overflow: hidden; box-shadow: 0 10px 30px rgba(15,23,42,0.06); }
-        .ck.ck-editor__main>.ck-editor__editable { min-height: 350px; font-family: 'Inter', sans-serif; font-size: 16px; padding: 18px 22px; }
-        .ck.ck-toolbar { background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(241,245,249,0.95)) !important; border-bottom: 1px solid rgba(148,163,184,0.2) !important; padding: 8px !important; }
+        /* CKEditor 5 Decoupled Document Styling */
+        #ckeditor-toolbar { border-radius: 14px 14px 0 0; overflow: hidden; background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(241,245,249,0.95)); border: 1px solid rgba(148,163,184,0.35); border-bottom: none; }
+        #ckeditor-toolbar .ck-toolbar { border: none !important; background: transparent !important; padding: 8px !important; flex-wrap: wrap !important; }
+        .ck-editor-container { border: 1px solid rgba(148,163,184,0.35); border-radius: 0 0 14px 14px; overflow: hidden; box-shadow: 0 10px 30px rgba(15,23,42,0.06); background: #fff; }
+        .ck-editor-container .ck-editor__editable { min-height: 350px; font-family: 'Inter', sans-serif; font-size: 16px; padding: 18px 22px !important; border: none !important; outline: none !important; box-shadow: none !important; }
+        .ck-editor-container .ck-editor__editable:focus { border: none !important; outline: none !important; box-shadow: none !important; }
         .ck.ck-button { border-radius: 6px !important; }
         .ck.ck-button:hover { background: rgba(59,130,246,0.1) !important; }
         .ck.ck-button.ck-on { background: linear-gradient(135deg, #3b82f6, #2563eb) !important; color: #fff !important; }
-        .ck.ck-editor__editable:not(.ck-editor__nested-editable).ck-focused { border-color: rgba(59,130,246,0.5) !important; box-shadow: 0 0 0 3px rgba(59,130,246,0.1) !important; }
-        .dark .ck.ck-editor__main>.ck-editor__editable { background: #1e293b !important; color: #e2e8f0 !important; }
-        .dark .ck.ck-toolbar { background: linear-gradient(135deg, rgba(30,41,59,0.98), rgba(51,65,85,0.95)) !important; }
+        .ck.ck-dropdown__panel { border-radius: 8px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important; }
+        .dark #ckeditor-toolbar { background: linear-gradient(135deg, rgba(30,41,59,0.98), rgba(51,65,85,0.95)); border-color: rgba(71,85,105,0.5); }
+        .dark .ck-editor-container { background: #1e293b; border-color: rgba(71,85,105,0.5); }
+        .dark .ck-editor-container .ck-editor__editable { background: #1e293b !important; color: #e2e8f0 !important; }
+        .dark .ck.ck-toolbar { background: transparent !important; }
         .dark .ck.ck-button { color: #e2e8f0 !important; }
         .dark .ck.ck-icon { color: #e2e8f0 !important; }
+        .dark .ck.ck-dropdown__panel { background: #1e293b !important; }
         #read-layer { max-width: 800px; margin: 0 auto; padding: 2rem; }
         #read-layer h1 { font-size: 2.25rem; font-weight: bold; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; }
         .dark #read-layer h1 { border-bottom-color: #334155; }
@@ -201,7 +206,8 @@
                 <div id="read-layer" class="p-6"></div>
                 <div id="edit-layer" class="max-w-3xl mx-auto p-4 md:p-6" style="display: none;">
                     <input type="text" id="editor-title" placeholder="Note Title..." class="w-full text-2xl lg:text-3xl font-bold bg-transparent outline-none mb-4 pb-2 border-b dark:border-dark-border dark:text-white placeholder-gray-400 dark:placeholder-gray-600">
-                    <div id="ckeditor-container"></div>
+                    <div id="ckeditor-toolbar"></div>
+                    <div id="ckeditor-container" class="ck-editor-container"></div>
                 </div>
             </div>
         </div>
@@ -946,81 +952,29 @@ const reader = {
     initEditor() {
         if (this.editor) return;
         
-        CKEDITOR.ClassicEditor
+        DecoupledEditor
             .create(document.querySelector('#ckeditor-container'), {
-                toolbar: {
-                    items: [
-                        'heading', '|',
-                        'fontFamily', 'fontSize', '|',
-                        'bold', 'italic', 'underline', 'strikethrough', '|',
-                        'fontColor', 'fontBackgroundColor', 'highlight', '|',
-                        'alignment', '|',
-                        'bulletedList', 'numberedList', 'todoList', '|',
-                        'outdent', 'indent', '|',
-                        'link', 'insertImage', 'insertTable', '|',
-                        'blockQuote', 'codeBlock', 'horizontalLine', '|',
-                        'subscript', 'superscript', '|',
-                        'specialCharacters', '|',
-                        'undo', 'redo', '|',
-                        'selectAll', 'findAndReplace'
-                    ],
-                    shouldNotGroupWhenFull: true
-                },
-                fontFamily: {
-                    options: [
-                        'default',
-                        'Inter, sans-serif',
-                        'Lato, sans-serif',
-                        'Montserrat, sans-serif',
-                        'Roboto, sans-serif',
-                        'Open Sans, sans-serif',
-                        'Merriweather, serif',
-                        'Poppins, sans-serif',
-                        'Raleway, sans-serif',
-                        'Source Sans 3, sans-serif',
-                        'Nunito, sans-serif',
-                        'Arial, sans-serif',
-                        'Georgia, serif',
-                        'Times New Roman, serif',
-                        'Courier New, monospace'
-                    ],
-                    supportAllValues: true
-                },
-                fontSize: {
-                    options: [10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48],
-                    supportAllValues: true
-                },
-                alignment: {
-                    options: ['left', 'center', 'right', 'justify']
-                },
-                heading: {
-                    options: [
-                        { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
-                        { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
-                        { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
-                        { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
-                    ]
-                },
-                highlight: {
-                    options: [
-                        { model: 'yellowMarker', class: 'marker-yellow', title: 'Yellow marker', color: 'var(--ck-highlight-marker-yellow)', type: 'marker' },
-                        { model: 'greenMarker', class: 'marker-green', title: 'Green marker', color: 'var(--ck-highlight-marker-green)', type: 'marker' },
-                        { model: 'pinkMarker', class: 'marker-pink', title: 'Pink marker', color: 'var(--ck-highlight-marker-pink)', type: 'marker' },
-                        { model: 'blueMarker', class: 'marker-blue', title: 'Blue marker', color: 'var(--ck-highlight-marker-blue)', type: 'marker' }
-                    ]
-                },
-                table: {
-                    contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells', 'tableProperties', 'tableCellProperties']
-                },
-                image: {
-                    toolbar: ['imageTextAlternative', 'toggleImageCaption', 'imageStyle:inline', 'imageStyle:block', 'imageStyle:side']
-                },
+                toolbar: [
+                    'heading', '|',
+                    'fontFamily', 'fontSize', '|',
+                    'bold', 'italic', 'underline', 'strikethrough', '|',
+                    'fontColor', 'fontBackgroundColor', '|',
+                    'alignment', '|',
+                    'bulletedList', 'numberedList', '|',
+                    'outdent', 'indent', '|',
+                    'link', 'blockQuote', '|',
+                    'undo', 'redo'
+                ],
                 language: 'en',
-                placeholder: 'Start writing...',
-                removePlugins: ['Title', 'CKFinderUploadAdapter', 'CKFinder', 'EasyImage', 'RealTimeCollaborativeComments', 'RealTimeCollaborativeTrackChanges', 'RealTimeCollaborativeRevisionHistory', 'PresenceList', 'Comments', 'TrackChanges', 'TrackChangesData', 'RevisionHistory', 'Pagination', 'WProofreader', 'MathType', 'SlashCommand', 'Template', 'DocumentOutline', 'FormatPainter', 'TableOfContents', 'PasteFromOfficeEnhanced', 'CaseChange']
+                placeholder: 'Start writing...'
             })
             .then(editor => {
                 this.editor = editor;
+                
+                // Insert toolbar into container
+                const toolbarContainer = document.querySelector('#ckeditor-toolbar');
+                toolbarContainer.innerHTML = '';
+                toolbarContainer.appendChild(editor.ui.view.toolbar.element);
                 
                 // Auto-save on content change
                 let saveTimeout;
@@ -1031,7 +985,7 @@ const reader = {
                     }, 500);
                 });
                 
-                console.log('CKEditor Super Build initialized with all features');
+                console.log('CKEditor Decoupled initialized');
             })
             .catch(error => {
                 console.error('CKEditor init error:', error);
