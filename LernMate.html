@@ -59,12 +59,11 @@
         .ql-font-nunito { font-family: 'Nunito', sans-serif; }
 
         /* Rich toolbar styling */
-        .editor-toolbar { position: sticky; top: 0; z-index: 100; display: flex; flex-wrap: nowrap; align-items: center; gap: 10px; padding: 12px 14px; margin-bottom: 22px; border-radius: 16px; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(241,245,249,0.9)); border: 1px solid rgba(148,163,184,0.3); box-shadow: 0 8px 32px rgba(15,23,42,0.1); backdrop-filter: blur(8px); overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; max-width: 100%; box-sizing: border-box; }
-        .editor-toolbar::-webkit-scrollbar { height: 6px; }
-        .editor-toolbar::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.5); border-radius: 3px; }
-        .editor-toolbar::-webkit-scrollbar-track { background: transparent; }
-        .tb-group { display: inline-flex; align-items: center; gap: 8px; padding: 4px 6px; background: rgba(241,245,249,0.6); border-radius: 10px; margin-right: 4px; flex: 0 0 auto; }
-        .tb-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-width: 36px; height: 36px; line-height: 1; background: #fff; border: 1px solid rgba(148,163,184,0.3); border-radius: 8px; font-size: 13px; font-weight: 500; color: #374151; cursor: pointer; transition: all 0.18s cubic-bezier(0.4,0,0.2,1); box-sizing: border-box; flex: 0 0 auto; }
+        .editor-toolbar { position: sticky; top: 0; z-index: 100; display: block; padding: 12px 14px; margin-bottom: 26px; border-radius: 16px; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(241,245,249,0.9)); border: 1px solid rgba(148,163,184,0.3); box-shadow: 0 8px 32px rgba(15,23,42,0.1); backdrop-filter: blur(8px); max-width: 100%; box-sizing: border-box; }
+        .toolbar-row { display: flex; flex-wrap: nowrap; align-items: center; gap: 10px; }
+        .toolbar-row + .toolbar-row { margin-top: 22px; }
+        .tb-group { display: inline-flex; align-items: center; gap: 8px; padding: 6px 8px; background: rgba(241,245,249,0.6); border-radius: 10px; margin-right: 4px; flex: 0 0 auto; }
+        .tb-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-width: 38px; height: 36px; line-height: 1; background: #fff; border: 1px solid rgba(148,163,184,0.3); border-radius: 8px; font-size: 13px; font-weight: 500; color: #374151; cursor: pointer; transition: all 0.18s cubic-bezier(0.4,0,0.2,1); box-sizing: border-box; flex: 0 0 auto; }
         .tb-btn:hover { transform: translateY(-2px) scale(1.04); box-shadow: 0 6px 20px rgba(59,130,246,0.18); background: linear-gradient(135deg, #fff, #f0f9ff); border-color: rgba(59,130,246,0.4); }
         .tb-btn:active { transform: translateY(0) scale(0.98); box-shadow: inset 0 2px 6px rgba(0,0,0,0.1); }
         .tb-btn.ql-active, .tb-btn.active { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border-color: #2563eb; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
@@ -72,7 +71,7 @@
         .tb-select { height: 36px; line-height: 36px; padding: 0 28px 0 10px; border: 1px solid rgba(148,163,184,0.3); border-radius: 8px; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M2 4l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 10px center; font-size: 13px; cursor: pointer; transition: all 0.15s ease; appearance: none; -webkit-appearance: none; -moz-appearance: none; flex: 0 0 auto; }
         .tb-select option { line-height: 1.5; }
         .tb-select:hover { border-color: rgba(59,130,246,0.5); box-shadow: 0 4px 12px rgba(59,130,246,0.1); }
-        .tb-color-input { width: 0; height: 0; opacity: 0; position: absolute; pointer-events: none; }
+        .tb-color-input { width: 0; height: 0; opacity: 0; position: absolute; pointer-events: none; left: -9999px; top: -9999px; }
         .tb-color-btn, .tb-highlight-btn { position: relative; }
         .dark .editor-toolbar { background: linear-gradient(135deg, rgba(30,41,59,0.95), rgba(51,65,85,0.9)); border-color: rgba(71,85,105,0.5); }
         .dark .tb-group { background: rgba(51,65,85,0.6); }
@@ -319,86 +318,85 @@
                 <div id="edit-layer" class="max-w-3xl mx-auto p-4 md:p-6" style="display: none;">
                     <input type="text" id="editor-title" placeholder="Note Title..." class="w-full text-2xl lg:text-3xl font-bold bg-transparent outline-none mb-4 pb-2 border-b dark:border-dark-border dark:text-white placeholder-gray-400 dark:placeholder-gray-600">
                     <div id="editor-toolbar" class="editor-toolbar">
-                        <!-- Font & Size -->
-                        <span class="tb-group">
-                            <select class="ql-font tb-select">
-                                <option value="inter" selected>Inter</option>
-                                <option value="lato">Lato</option>
-                                <option value="montserrat">Montserrat</option>
-                                <option value="roboto">Roboto</option>
-                                <option value="open_sans">Open Sans</option>
-                                <option value="merriweather">Merriweather</option>
-                                <option value="poppins">Poppins</option>
-                                <option value="raleway">Raleway</option>
-                                <option value="source-sans-3">Source Sans 3</option>
-                                <option value="nunito">Nunito</option>
-                            </select>
-                            <select class="ql-size tb-select">
-                                <option value="12px">12</option>
-                                <option value="14px">14</option>
-                                <option value="16px" selected>16</option>
-                                <option value="18px">18</option>
-                                <option value="24px">24</option>
-                                <option value="32px">32</option>
-                            </select>
-                        </span>
+                        <div class="toolbar-row">
+                            <!-- Font & Size -->
+                            <span class="tb-group">
+                                <select class="ql-font tb-select">
+                                    <option value="inter" selected>Inter</option>
+                                    <option value="lato">Lato</option>
+                                    <option value="montserrat">Montserrat</option>
+                                    <option value="roboto">Roboto</option>
+                                    <option value="open_sans">Open Sans</option>
+                                    <option value="merriweather">Merriweather</option>
+                                    <option value="poppins">Poppins</option>
+                                    <option value="raleway">Raleway</option>
+                                    <option value="source-sans-3">Source Sans 3</option>
+                                    <option value="nunito">Nunito</option>
+                                </select>
+                                <select class="ql-size tb-select">
+                                    <option value="12px">12</option>
+                                    <option value="14px">14</option>
+                                    <option value="16px" selected>16</option>
+                                    <option value="18px">18</option>
+                                    <option value="24px">24</option>
+                                    <option value="32px">32</option>
+                                </select>
+                            </span>
 
-                        <!-- Bold / Italic / Underline -->
-                        <span class="tb-group">
-                            <button class="ql-bold tb-btn" title="Bold"><i class="fas fa-bold"></i></button>
-                            <button class="ql-italic tb-btn" title="Italic"><i class="fas fa-italic"></i></button>
-                            <button class="ql-underline tb-btn" title="Underline"><i class="fas fa-underline"></i></button>
-                        </span>
+                            <!-- Bold / Italic / Underline -->
+                            <span class="tb-group">
+                                <button class="ql-bold tb-btn" title="Bold"><i class="fas fa-bold"></i></button>
+                                <button class="ql-italic tb-btn" title="Italic"><i class="fas fa-italic"></i></button>
+                                <button class="ql-underline tb-btn" title="Underline"><i class="fas fa-underline"></i></button>
+                            </span>
 
-                        <!-- Text Color & Highlight -->
-                        <span class="tb-group">
-                            <button class="tb-btn tb-color-btn" title="Text Color" data-action="color"><i class="fas fa-palette"></i></button>
-                            <input type="color" id="tb-color-picker" class="tb-color-input" value="#000000">
-                            <button class="tb-btn tb-highlight-btn" title="Highlight" data-action="background"><i class="fas fa-highlighter"></i></button>
-                            <input type="color" id="tb-highlight-picker" class="tb-color-input" value="#ffff00">
-                        </span>
+                            <!-- Text Color & Highlight -->
+                            <span class="tb-group">
+                                <button class="tb-btn tb-color-btn" title="Text Color" data-action="color"><i class="fas fa-palette"></i></button>
+                                <input type="color" id="tb-color-picker" class="tb-color-input" value="#000000">
+                                <button class="tb-btn tb-highlight-btn" title="Highlight" data-action="background"><i class="fas fa-highlighter"></i></button>
+                                <input type="color" id="tb-highlight-picker" class="tb-color-input" value="#ffff00">
+                            </span>
+                        </div>
+                        <div class="toolbar-row">
+                            <!-- Alignment: 4 buttons -->
+                            <span class="tb-group">
+                                <button class="ql-align tb-btn" value="" title="Align Left"><i class="fas fa-align-left"></i></button>
+                                <button class="ql-align tb-btn" value="center" title="Align Center"><i class="fas fa-align-center"></i></button>
+                                <button class="ql-align tb-btn" value="right" title="Align Right"><i class="fas fa-align-right"></i></button>
+                                <button class="ql-align tb-btn" value="justify" title="Justify"><i class="fas fa-align-justify"></i></button>
+                            </span>
 
-                        <!-- Alignment: 4 buttons -->
-                        <span class="tb-group">
-                            <button class="ql-align tb-btn" value="" title="Align Left"><i class="fas fa-align-left"></i></button>
-                            <button class="ql-align tb-btn" value="center" title="Align Center"><i class="fas fa-align-center"></i></button>
-                            <button class="ql-align tb-btn" value="right" title="Align Right"><i class="fas fa-align-right"></i></button>
-                            <button class="ql-align tb-btn" value="justify" title="Justify"><i class="fas fa-align-justify"></i></button>
-                        </span>
+                            <!-- Justify Levels: Low / Medium / High -->
+                            <span class="tb-group">
+                                <button class="tb-btn tb-justify-level" data-level="low" title="Justify Low"><i class="fas fa-text-width"></i> L</button>
+                                <button class="tb-btn tb-justify-level" data-level="medium" title="Justify Medium"><i class="fas fa-text-width"></i> M</button>
+                                <button class="tb-btn tb-justify-level" data-level="high" title="Justify High"><i class="fas fa-text-width"></i> H</button>
+                            </span>
 
-                        <!-- Justify Levels (dropdown) -->
-                        <span class="tb-group">
-                            <select class="tb-select tb-justify-select" title="Justify Level">
-                                <option value="low">Justify L</option>
-                                <option value="medium" selected>Justify M</option>
-                                <option value="high">Justify H</option>
-                            </select>
-                        </span>
+                            <!-- Line Height -->
+                            <span class="tb-group">
+                                <button class="tb-btn tb-lineheight" data-lh="1" title="Line Height 1x"><i class="fas fa-arrows-alt-v"></i> 1x</button>
+                                <button class="tb-btn tb-lineheight" data-lh="1.5" title="Line Height 1.5x"><i class="fas fa-arrows-alt-v"></i> 1.5x</button>
+                                <button class="tb-btn tb-lineheight" data-lh="2" title="Line Height 2x"><i class="fas fa-arrows-alt-v"></i> 2x</button>
+                            </span>
 
-                        <!-- Line Height (dropdown) -->
-                        <span class="tb-group">
-                            <select class="tb-select tb-lineheight-select" title="Line Height">
-                                <option value="1">1x</option>
-                                <option value="1.5" selected>1.5x</option>
-                                <option value="2">2x</option>
-                            </select>
-                        </span>
+                            <!-- Lists -->
+                            <span class="tb-group">
+                                <button class="ql-list tb-btn" value="bullet" title="Bullet List"><i class="fas fa-list-ul"></i></button>
+                                <button class="ql-list tb-btn" value="ordered" title="Numbered List"><i class="fas fa-list-ol"></i></button>
+                            </span>
 
-                        <!-- Lists -->
-                        <span class="tb-group">
-                            <button class="ql-list tb-btn" value="bullet" title="Bullet List"><i class="fas fa-list-ul"></i></button>
-                            <button class="ql-list tb-btn" value="ordered" title="Numbered List"><i class="fas fa-list-ol"></i></button>
-                        </span>
+                            <!-- Direction (single toggle) -->
+                            <span class="tb-group">
+                                <button class="tb-btn tb-direction" title="Toggle RTL/LTR"><i class="fas fa-exchange-alt"></i></button>
+                            </span>
 
-                        <!-- Direction (single toggle) -->
-                        <span class="tb-group">
-                            <button class="tb-btn tb-direction" title="Toggle RTL/LTR"><i class="fas fa-exchange-alt"></i></button>
-                        </span>
-
-                        <!-- Image -->
-                        <span class="tb-group">
-                            <button class="ql-image tb-btn" title="Insert Image"><i class="fas fa-image"></i></button>
-                        </span>
+                            <!-- Image -->
+                            <span class="tb-group">
+                                <button class="ql-image tb-btn" title="Insert Image"><i class="fas fa-image"></i></button>
+                            </span>
+                        </div>
                     </div>
                     <div id="editor-quill" style="background: #fff;"></div>
                 </div>
@@ -1195,31 +1193,33 @@ const reader = {
         const toolbar = document.getElementById('editor-toolbar');
         if (!toolbar) return;
 
-        // Line Height (dropdown)
-        const lhSelect = toolbar.querySelector('.tb-lineheight-select');
-        if (lhSelect) {
-            lhSelect.addEventListener('change', (e) => {
+        // Line Height buttons
+        toolbar.querySelectorAll('.tb-lineheight').forEach(btn => {
+            btn.addEventListener('click', () => {
                 this.quill.focus();
-                const lh = e.target.value;
+                const lh = btn.dataset.lh;
                 const range = this.quill.getSelection(true);
                 if (range) this.quill.format('lineheight', lh);
+                toolbar.querySelectorAll('.tb-lineheight').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
             });
-        }
+        });
 
-        // Justify Level (dropdown) -> sets align=justify + word-spacing
-        const justifySelect = toolbar.querySelector('.tb-justify-select');
-        if (justifySelect) {
-            justifySelect.addEventListener('change', (e) => {
+        // Justify Levels buttons
+        toolbar.querySelectorAll('.tb-justify-level').forEach(btn => {
+            btn.addEventListener('click', () => {
                 this.quill.focus();
-                const level = e.target.value;
+                const level = btn.dataset.level;
                 const spacing = level === 'low' ? '0px' : level === 'medium' ? '2px' : '5px';
                 const range = this.quill.getSelection(true);
                 if (range) {
                     this.quill.format('align', 'justify');
                     this.quill.format('wordspacing', spacing);
                 }
+                toolbar.querySelectorAll('.tb-justify-level').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
             });
-        }
+        });
 
         // Direction toggle (RTL/LTR)
         const dirBtn = toolbar.querySelector('.tb-direction');
@@ -1236,7 +1236,7 @@ const reader = {
                 if (nextDir === 'rtl') {
                     this.quill.format('align', 'right');
                 } else {
-                    this.quill.format('align', false); // remove align to default left
+                    this.quill.format('align', false);
                 }
             });
         }
@@ -1244,20 +1244,24 @@ const reader = {
         // Text Color picker
         const colorBtn = toolbar.querySelector('.tb-color-btn');
         const colorPicker = document.getElementById('tb-color-picker');
-        colorBtn.addEventListener('click', () => colorPicker.click());
-        colorPicker.addEventListener('input', (e) => {
-            const range = this.quill.getSelection();
-            if (range) this.quill.format('color', e.target.value);
-        });
+        if (colorBtn && colorPicker) {
+            colorBtn.addEventListener('click', () => colorPicker.click());
+            colorPicker.addEventListener('input', (e) => {
+                const range = this.quill.getSelection(true);
+                if (range) this.quill.format('color', e.target.value);
+            });
+        }
 
         // Highlight/Background Color picker
         const highlightBtn = toolbar.querySelector('.tb-highlight-btn');
         const highlightPicker = document.getElementById('tb-highlight-picker');
-        highlightBtn.addEventListener('click', () => highlightPicker.click());
-        highlightPicker.addEventListener('input', (e) => {
-            const range = this.quill.getSelection();
-            if (range) this.quill.format('background', e.target.value);
-        });
+        if (highlightBtn && highlightPicker) {
+            highlightBtn.addEventListener('click', () => highlightPicker.click());
+            highlightPicker.addEventListener('input', (e) => {
+                const range = this.quill.getSelection(true);
+                if (range) this.quill.format('background', e.target.value);
+            });
+        }
     },
 
     saveCurrentFile() {
