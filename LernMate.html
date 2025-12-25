@@ -293,82 +293,10 @@
         
         <div id="view-reader" class="hidden h-full">
             <div id="reader-container" class="bg-white dark:bg-dark-card rounded-2xl shadow-sm border border-gray-100 dark:border-dark-border mx-auto max-w-4xl relative text-gray-900 dark:text-gray-200 ql-snow">
-                <div id="read-layer" class="ql-editor"></div>
+                <div id="read-layer" class="p-6"></div>
                 <div id="edit-layer" class="max-w-3xl mx-auto p-4 md:p-6" style="display: none;">
                     <input type="text" id="editor-title" placeholder="Note Title..." class="w-full text-2xl lg:text-3xl font-bold bg-transparent outline-none mb-4 pb-2 border-b dark:border-dark-border dark:text-white placeholder-gray-400 dark:placeholder-gray-600">
-                    <div id="custom-toolbar" class="mb-4"
-                        style="overflow:visible;">
-                        <div class="toolbar-group">
-                            <select id="tb-font" class="tb-select">
-                                <option value="lato">Lato</option>
-                                <option value="montserrat">Montserrat</option>
-                                <option value="roboto">Roboto</option>
-                                <option value="open_sans">Open Sans</option>
-                                <option value="merriweather">Merriweather</option>
-                                <option value="poppins">Poppins</option>
-                                <option value="raleway">Raleway</option>
-                                <option value="source-sans-3">Source Sans 3</option>
-                                <option value="nunito">Nunito</option>
-                            </select>
-                            <select id="tb-size" class="tb-select" style="min-width:45px;">
-                                <option value="12px">12</option>
-                                <option value="14px">14</option>
-                                <option value="16px" selected>16</option>
-                                <option value="18px">18</option>
-                                <option value="20px">20</option>
-                                <option value="24px">24</option>
-                            </select>
-                        </div>
-
-                        <div class="toolbar-group">
-                            <button id="tb-bold" title="Bold" class="tb-btn"><i class="fas fa-bold"></i></button>
-                            <button id="tb-italic" title="Italic" class="tb-btn"><i class="fas fa-italic"></i></button>
-                            <button id="tb-underline" title="Underline" class="tb-btn"><i class="fas fa-underline"></i></button>
-                        </div>
-
-                        <div class="toolbar-group">
-                            <div class="tb-color-group">
-                                <span class="tb-color-label">T</span>
-                                <input id="tb-color" type="color" title="Text color" class="tb-color" value="#000000">
-                            </div>
-                            <div class="tb-color-group">
-                                <span class="tb-color-label">H</span>
-                                <input id="tb-bg" type="color" title="Highlight color" class="tb-color" value="#ffffff">
-                            </div>
-                        </div>
-
-                        <div class="toolbar-group">
-                            <button id="tb-align-left" title="Left" class="tb-btn"><i class="fas fa-align-left"></i></button>
-                            <button id="tb-align-center" title="Center" class="tb-btn"><i class="fas fa-align-center"></i></button>
-                            <button id="tb-align-right" title="Right" class="tb-btn"><i class="fas fa-align-right"></i></button>
-                            <button id="tb-align-justify" title="Justify" class="tb-btn"><i class="fas fa-align-justify"></i></button>
-                            <select id="tb-justify-level" title="Justify strength" class="tb-select">
-                                <option value="normal">Normal</option>
-                                <option value="low">Low</option>
-                                <option value="medium">Medium</option>
-                                <option value="high">High</option>
-                            </select>
-                        </div>
-
-                        <div class="toolbar-group">
-                            <select id="tb-lineheight" class="tb-select">
-                                <option value="1">1</option>
-                                <option value="1.15">1.15</option>
-                                <option value="1.5">1.5</option>
-                                <option value="2">2</option>
-                                <option value="2.5">2.5</option>
-                            </select>
-                            <button id="tb-ltr" title="LTR" class="tb-btn"><i class="fas fa-arrow-right"></i></button>
-                            <button id="tb-rtl" title="RTL" class="tb-btn"><i class="fas fa-arrow-left"></i></button>
-                        </div>
-
-                        <div class="toolbar-group">
-                            <button id="tb-list-bullet" title="Bullet list" class="tb-btn"><i class="fas fa-list-ul"></i></button>
-                            <button id="tb-image" title="Insert image" class="tb-btn"><i class="fas fa-image"></i></button>
-                        </div>
-                    </div>
-                    <input type="file" id="tb-image-input" accept="image/*" class="hidden">
-                    <div id="editor-quill"></div>
+                    <div id="editor-quill" style="min-height: 300px; background: #fff;"></div>
                 </div>
             </div>
         </div>
@@ -1108,428 +1036,130 @@ const reader = {
     initEditor() {
         if (this.quill) return;
 
-        const Font = Quill.import('formats/font');
-        Font.whitelist = ['inter','lato', 'montserrat', 'roboto', 'open_sans', 'merriweather','poppins','raleway','source-sans-3','nunito'];
-        Quill.register(Font, true);
-
-        const Parchment = Quill.import('parchment');
-        
-        // Line Height - Block level
-        class LineHeightClass extends Parchment.Attributor.Style {}
-        const LineHeight = new LineHeightClass('lineheight', 'line-height', {
-            scope: Parchment.Scope.BLOCK,
-            whitelist: ['1', '1.15', '1.5', '2', '2.5']
-        });
-        Quill.register(LineHeight, true);
-
-        // Font Size - Inline level
-        class SizeStyle extends Parchment.Attributor.Style {}
-        const FontSize = new SizeStyle('size', 'font-size', {
-            scope: Parchment.Scope.INLINE,
-            whitelist: ['12px','14px','16px','18px','20px','24px']
-        });
-        Quill.register(FontSize, true);
-
-        // Word Spacing - Block level (for justify strength)
-        class WordSpacingStyle extends Parchment.Attributor.Style {}
-        const WordSpacing = new WordSpacingStyle('wordspacing', 'word-spacing', {
-            scope: Parchment.Scope.BLOCK,
-            whitelist: ['0.02em','0.04em','0.08em']
-        });
-        Quill.register(WordSpacing, true);
-
-        // Direction - Block level attribute
-        class DirectionStyle extends Parchment.Attributor.Attribute {}
-        const Direction = new DirectionStyle('direction', 'dir', {
-            scope: Parchment.Scope.BLOCK
-        });
-        Quill.register(Direction, true);
-        
-        // Register align module with proper options
-        const Align = Quill.import('formats/align');
-        Align.whitelist = ['left', 'center', 'right', 'justify'];
-        Quill.register(Align, true);
-
+        // Simple Quill setup without custom formats for now
         this.quill = new Quill('#editor-quill', {
             modules: {
-                toolbar: false
+                toolbar: [
+                    ['bold', 'italic', 'underline'],
+                    [{ 'align': [] }],
+                    [{ 'list': 'bullet' }],
+                    ['clean']
+                ]
             },
-            placeholder: '',
             theme: 'snow'
         });
 
-        // Force enable all necessary formats
-        this.quill.enable(true);
-
-        // Custom toolbar wiring
-        const tbFont = document.getElementById('tb-font');
-        const tbSize = document.getElementById('tb-size');
-        const tbBold = document.getElementById('tb-bold');
-        const tbItalic = document.getElementById('tb-italic');
-        const tbUnderline = document.getElementById('tb-underline');
-        const tbColor = document.getElementById('tb-color');
-        const tbBg = document.getElementById('tb-bg');
-        const alignLeft = document.getElementById('tb-align-left');
-        const alignCenter = document.getElementById('tb-align-center');
-        const alignRight = document.getElementById('tb-align-right');
-        const alignJustify = document.getElementById('tb-align-justify');
-        const tbJustifyLevel = document.getElementById('tb-justify-level');
-        const tbLine = document.getElementById('tb-lineheight');
-        const dirLtr = document.getElementById('tb-ltr');
-        const dirRtl = document.getElementById('tb-rtl');
-        const tbImage = document.getElementById('tb-image');
-        const tbImageInput = document.getElementById('tb-image-input');
-        const tbBullet = document.getElementById('tb-list-bullet');
-
-        function applyToSelectionOrAll(format, value, isLine) {
-            const range = this.quill.getSelection();
-            if (!range || range.length === 0) {
-                // apply to entire editor (all lines)
-                const len = this.quill.getLength();
-                if (isLine) {
-                    this.quill.formatLine(0, len, format, value);
-                } else {
-                    this.quill.formatText(0, len, format, value);
-                }
-            } else {
-                if (isLine) this.quill.formatLine(range.index, range.length, format, value);
-                else this.quill.format(format, value);
-            }
-        }
-
-        // Fonts
-        if (tbFont) tbFont.addEventListener('change', (e) => {
-            const v = e.target.value;
-            applyToSelectionOrAll.call(this, 'font', v, false);
-        });
-        if (tbSize) tbSize.addEventListener('change', (e) => {
-            const v = e.target.value;
-            applyToSelectionOrAll.call(this, 'size', v, false);
-        });
-
-        if (tbBold) tbBold.addEventListener('click', () => { this.quill.format('bold', !this.quill.getFormat().bold); });
-        if (tbItalic) tbItalic.addEventListener('click', () => { this.quill.format('italic', !this.quill.getFormat().italic); });
-        if (tbUnderline) tbUnderline.addEventListener('click', () => { this.quill.format('underline', !this.quill.getFormat().underline); });
-
-        if (tbColor) tbColor.addEventListener('input', (e) => { applyToSelectionOrAll.call(this, 'color', e.target.value, false); });
-        if (tbBg) tbBg.addEventListener('input', (e) => { applyToSelectionOrAll.call(this, 'background', e.target.value, false); });
-
-        if (alignLeft) alignLeft.addEventListener('click', () => { 
-            const range = this.quill.getSelection();
-            const len = this.quill.getLength();
-            if (!range || range.length === 0) {
-                this.quill.formatLine(0, len, 'align', 'left');
-            } else {
-                this.quill.formatLine(range.index, range.length, 'align', 'left');
-            }
-        });
-        
-        if (alignCenter) alignCenter.addEventListener('click', () => { 
-            const range = this.quill.getSelection();
-            const len = this.quill.getLength();
-            if (!range || range.length === 0) {
-                this.quill.formatLine(0, len, 'align', 'center');
-            } else {
-                this.quill.formatLine(range.index, range.length, 'align', 'center');
-            }
-        });
-        
-        if (alignRight) alignRight.addEventListener('click', () => { 
-            const range = this.quill.getSelection();
-            const len = this.quill.getLength();
-            if (!range || range.length === 0) {
-                this.quill.formatLine(0, len, 'align', 'right');
-            } else {
-                this.quill.formatLine(range.index, range.length, 'align', 'right');
-            }
-        });
-        
-        if (alignJustify) alignJustify.addEventListener('click', () => {
-            const range = this.quill.getSelection();
-            const len = this.quill.getLength();
-            if (!range || range.length === 0) {
-                this.quill.formatLine(0, len, 'align', 'justify');
-            } else {
-                this.quill.formatLine(range.index, range.length, 'align', 'justify');
-            }
-            // If a justify-strength is selected, map it to word-spacing
-            if (tbJustifyLevel) {
-                const lvl = tbJustifyLevel.value;
-                const map = { normal: '0em', low: '0.02em', medium: '0.04em', high: '0.08em' };
-                if (map[lvl]) {
-                    if (!range || range.length === 0) {
-                        this.quill.formatLine(0, len, 'wordspacing', map[lvl]);
-                    } else {
-                        this.quill.formatLine(range.index, range.length, 'wordspacing', map[lvl]);
-                    }
-                }
-            }
-        });
-        
-        if (tbJustifyLevel) tbJustifyLevel.addEventListener('change', (e) => {
-            const lvl = e.target.value;
-            const map = { normal: '0em', low: '0.02em', medium: '0.04em', high: '0.08em' };
-            const range = this.quill.getSelection();
-            const len = this.quill.getLength();
-            if (map[lvl]) {
-                if (!range || range.length === 0) {
-                    this.quill.formatLine(0, len, 'wordspacing', map[lvl]);
-                } else {
-                    this.quill.formatLine(range.index, range.length, 'wordspacing', map[lvl]);
-                }
-            }
-        });
-
-        if (tbLine) tbLine.addEventListener('change', (e) => {
-            const v = e.target.value;
-            applyToSelectionOrAll.call(this, 'lineheight', v, true);
-        });
-
-        if (dirLtr) dirLtr.addEventListener('click', () => {
-            const range = this.quill.getSelection();
-            const len = this.quill.getLength();
-            if (!range || range.length === 0) {
-                this.quill.formatLine(0, len, 'direction', 'ltr');
-                this.quill.formatLine(0, len, 'align', 'left');
-            } else {
-                this.quill.formatLine(range.index, range.length, 'direction', 'ltr');
-                this.quill.formatLine(range.index, range.length, 'align', 'left');
-            }
-        });
-        
-        if (dirRtl) dirRtl.addEventListener('click', () => {
-            const range = this.quill.getSelection();
-            const len = this.quill.getLength();
-            if (!range || range.length === 0) {
-                this.quill.formatLine(0, len, 'direction', 'rtl');
-                this.quill.formatLine(0, len, 'align', 'right');
-            } else {
-                this.quill.formatLine(range.index, range.length, 'direction', 'rtl');
-                this.quill.formatLine(range.index, range.length, 'align', 'right');
-            }
-        });
-
-        if (tbImage && tbImageInput) {
-            tbImage.addEventListener('click', () => tbImageInput.click());
-            tbImageInput.addEventListener('change', (ev) => {
-                const f = ev.target.files[0];
-                if (!f) return;
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const range = this.quill.getSelection() || { index: this.quill.getLength() };
-                    this.quill.insertEmbed(range.index, 'image', e.target.result, 'user');
-                };
-                reader.readAsDataURL(f);
-            });
-        }
-
-        if (tbBullet) tbBullet.addEventListener('click', () => { applyToSelectionOrAll.call(this, 'list', 'bullet', true); });
-
-        // Setup line height handler
-        const lineHeightSelect = document.getElementById('tb-lineheight');
-        if (lineHeightSelect) {
-            lineHeightSelect.addEventListener('change', (e) => {
-                const value = e.target.value;
-                if (value) {
-                    // Apply as a block-level format to the selected lines
-                    const range = this.quill.getSelection();
-                    if (range) {
-                        this.quill.formatLine(range.index, Math.max(range.length, 1), 'lineheight', value);
-                    } else {
-                        this.quill.format('lineheight', value);
-                    }
-                    // keep the select value so user sees current selection
-                }
-            });
-        }
-
-        // Auto-save on text change
+        // Auto-save on text change with debounce
+        let saveTimeout;
         this.quill.on('text-change', () => {
-            this.autoSaveContent();
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                this.saveCurrentFile();
+            }, 500);
         });
-    },
-
-    loadFile(file) {
-        // Store the file ID locally
-        this.currentFileId = file.id;
-        app.currentFileId = file.id;
-        document.getElementById('page-title').innerText = (file.title && file.title.trim()) ? file.title : '';
-
-        const readDiv = document.getElementById('read-layer');
-        const editDiv = document.getElementById('edit-layer');
         
-        // Don't clear readDiv here - let setMode handle it
-        editDiv.style.display = 'none';
-
-        if (file.type === 'text') {
-            // Ensure content is available before switching mode
-            if (!file.content || file.content.trim() === '') {
-                file.content = '<p><br></p>';
-            }
-            this.setMode('read');
-        } else {
-            readDiv.innerHTML = '<div class="flex justify-center py-8"><div class="loader"></div></div>';
-            readDiv.style.display = 'block';
-
-            const loadPDF = async () => {
-                try {
-                    const pdf = await pdfjsLib.getDocument(file.content).promise;
-                    readDiv.innerHTML = '';
-                    for(let i=1; i<=pdf.numPages; i++) {
-                        const page = await pdf.getPage(i);
-                        const vp = page.getViewport({scale: 1.5});
-                        const cvs = document.createElement('canvas');
-                        cvs.width = vp.width;
-                        cvs.height = vp.height;
-                        cvs.className = "mb-4 shadow-sm mx-auto bg-white dark:bg-dark-card";
-                        readDiv.appendChild(cvs);
-                        await page.render({canvasContext: cvs.getContext('2d'), viewport: vp});
-                    }
-                } catch(e) {
-                    readDiv.innerHTML = '<p class="text-center text-red-500">خطا در بارگیری PDF.</p>';
-                }
-            };
-            loadPDF();
-            this.setMode('read');
-        }
+        console.log('Quill initialized:', this.quill);
     },
 
-    autoSaveContent() {
-        console.log('AutoSave called - quill:', !!this.quill, 'currentFileId:', this.currentFileId, 'view:', app.view, 'mode:', this.mode);
+    saveCurrentFile() {
         if (!this.quill || !this.currentFileId) return;
-        if (app.view !== 'reader') return;
-        if (this.mode !== 'edit') return;
-
+        
         const file = app.files.find(f => f.id === this.currentFileId);
         if (!file || file.type !== 'text') return;
 
-        // Update file content immediately
+        // Get content from Quill
         const content = this.quill.root.innerHTML;
-        console.log('AutoSaving content:', content);
+        console.log('Saving file content:', content);
+        
+        // Save content
         file.content = content;
-
-        // Update title if it changed (from the separate title input).
-        // If the input is empty and file.title is empty, try to extract a leading <h1> from content.
+        
+        // Save title
         const titleInput = document.getElementById('editor-title');
-        if (titleInput && titleInput.value.trim()) {
+        if (titleInput) {
             file.title = titleInput.value.trim();
-        } else {
-            if ((!file.title || !file.title.trim()) && this.quill) {
-                const html = this.quill.root.innerHTML || '';
-                const h1Match = html.match(/^\s*<h1[^>]*>([\s\S]*?)<\/h1>/i);
-                if (h1Match) {
-                    file.title = h1Match[1].trim();
-                }
-            }
         }
-
-        // Update last edited timestamp
+        
         file.lastEdited = Date.now();
-
-        // Save to localStorage
         app.save();
     },
 
-    saveContent() {
-        this.autoSaveContent();
+    loadFile(file) {
+        console.log('Loading file:', file.id, file.name);
+        
+        this.currentFileId = file.id;
+        app.currentFileId = file.id;
+        
+        document.getElementById('page-title').innerText = file.title || file.name || '';
+
+        // Always start in read mode
+        this.setMode('read');
     },
 
     setMode(m) {
+        console.log('setMode called:', m);
+        
         const readLayer = document.getElementById('read-layer');
         const editLayer = document.getElementById('edit-layer');
         const btnRead = document.getElementById('btn-read');
         const btnEdit = document.getElementById('btn-edit');
 
-        // Get fresh file data each time
         const file = app.files.find(f => f.id === this.currentFileId);
-        if (!file) return;
+        if (!file) {
+            console.log('No file found for id:', this.currentFileId);
+            return;
+        }
 
+        // Reset button styles
         btnRead.className = btnEdit.className = "px-4 py-1.5 rounded-md text-xs font-bold transition text-gray-500 dark:text-gray-400";
 
         if (m === 'read') {
-            btnRead.classList.add('bg-white', 'dark:bg-gray-700', 'shadow-sm');
-            btnRead.classList.remove('text-gray-500', 'dark:text-gray-400');
-
-            // ALWAYS save content when switching to read (regardless of previous mode)
-            if (this.quill) {
-                const quillHTML = this.quill.root.innerHTML;
-                console.log('Quill root innerHTML:', quillHTML);
-                console.log('Quill getText:', this.quill.getText());
-                console.log('Quill getContents:', JSON.stringify(this.quill.getContents()));
-                
-                file.content = quillHTML;
-                console.log('Saving content to file:', file.content);
-                const titleInput = document.getElementById('editor-title');
-                if (titleInput) {
-                    file.title = titleInput.value.trim();
-                }
-                file.lastEdited = Date.now();
-                app.save();
+            // If coming from edit mode, save first
+            if (this.mode === 'edit' && this.quill) {
+                this.saveCurrentFile();
             }
             
-            // Now update mode
-            this.mode = m;
+            this.mode = 'read';
+            btnRead.classList.add('bg-white', 'dark:bg-gray-700', 'shadow-sm');
 
-            // Determine display title: prefer explicit file.title (if set and different from filename).
-            // If not available, try to extract a leading <h1> from the content. Never use filename as title.
-            let displayTitle = '';
-            let contentToShow = file.content || '';
-            console.log('Content to show in read mode:', contentToShow);
-            if (file.title && file.title.trim() && file.title !== file.name) {
-                displayTitle = file.title.trim();
-            } else {
-                const h1Match = contentToShow.match(/^\s*<h1[^>]*>([\s\S]*?)<\/h1>/i);
-                if (h1Match) {
-                    displayTitle = h1Match[1].trim();
-                    contentToShow = contentToShow.replace(/^\s*<h1[^>]*>[\s\S]*?<\/h1>/i, '');
-                }
-            }
-
-            // Update page title in header
-            document.getElementById('page-title').innerText = displayTitle;
-
-            readLayer.innerHTML = (displayTitle ? `<h1>${displayTitle}</h1>` : '') + contentToShow;
+            // Display content in read layer
+            const title = file.title || '';
+            const content = file.content || '';
+            
+            console.log('Displaying in read mode - title:', title, 'content:', content);
+            
+            readLayer.innerHTML = (title ? `<h1 class="text-2xl font-bold mb-4 pb-2 border-b">${title}</h1>` : '') + content;
+            
+            document.getElementById('page-title').innerText = title || file.name || '';
             
             editLayer.style.display = 'none';
             readLayer.style.display = 'block';
+            
         } else {
-            // Switching to edit mode
-            if (file.type === 'pdf') {
-                alert("ویرایش فایل PDF پشتیبانی نمی‌شود.");
-                this.setMode('read');
-                return;
-            }
-
-            // Update mode first
-            this.mode = m;
-
+            // Edit mode
+            this.mode = 'edit';
             btnEdit.classList.add('bg-white', 'dark:bg-gray-700', 'shadow-sm');
-            btnEdit.classList.remove('text-gray-500', 'dark:text-gray-400');
 
-            // Clear and reload editor with fresh data
+            // Set title
             document.getElementById('editor-title').value = file.title || '';
 
-            // Load content into Quill editor
+            // Set Quill content
             if (this.quill) {
-                const contentToLoad = file.content || '<p><br></p>';
-                console.log('Loading into editor:', contentToLoad);
+                // Clear editor first
+                this.quill.setText('');
                 
-                // Use Quill's clipboard to properly set HTML content
-                this.quill.clipboard.dangerouslyPasteHTML(0, contentToLoad);
+                // Load content
+                if (file.content && file.content.trim() !== '' && file.content !== '<p><br></p>') {
+                    this.quill.clipboard.dangerouslyPasteHTML(file.content);
+                }
                 
-                // Update the line-height select to reflect the current first-line setting
-                setTimeout(() => {
-                    const lhSelect = document.getElementById('tb-lineheight');
-                    if (lhSelect) {
-                        const fmt = this.quill.getFormat(0) || {};
-                        lhSelect.value = fmt.lineheight || '';
-                    }
-                }, 50);
+                console.log('Loaded into Quill:', this.quill.root.innerHTML);
             }
 
             readLayer.style.display = 'none';
             editLayer.style.display = 'block';
             
+            // Focus editor
             setTimeout(() => {
                 if (this.quill) this.quill.focus();
             }, 100);
@@ -1537,30 +1167,21 @@ const reader = {
     },
 
     initEvents() {
-        // Setup double-click word selection for AI analysis
+        // Double-click for AI analysis in read mode
         setTimeout(() => {
             const readerContainer = document.getElementById('reader-container');
             if (!readerContainer) return;
             
-            // Remove any existing listener
-            const newContainer = readerContainer.cloneNode(true);
-            readerContainer.parentNode.replaceChild(newContainer, readerContainer);
-            
-            document.getElementById('reader-container').addEventListener('dblclick', function(e) {
-                // Must be in read mode
-                if (reader.mode !== 'read') return;
-                
-                // Don't trigger if in edit layer
+            readerContainer.addEventListener('dblclick', (e) => {
+                if (this.mode !== 'read') return;
                 if (e.target.closest('#edit-layer')) return;
 
                 const selection = window.getSelection();
                 const selectedText = selection.toString().trim();
 
-                // Must have selected text that's a single word
                 if (!selectedText || selectedText.length < 2) return;
                 if (selectedText.split(' ').length > 1) return;
 
-                // Get the sentence
                 let sentence = '';
                 if (selection.anchorNode) {
                     let element = selection.anchorNode.nodeType === 3 
