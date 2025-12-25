@@ -19,9 +19,8 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Quill Rich Text Editor -->
-    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.7/quill.js"></script>
+    <!-- CKEditor 5 Full Build (Free, no API key needed) -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/decoupled-document/ckeditor.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -30,11 +29,14 @@
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap');
         
         body { font-family: 'Inter', sans-serif; overflow: hidden; -webkit-tap-highlight-color: transparent; }
         .rtl-text { font-family: 'Vazirmatn', sans-serif; direction: rtl; text-align: right; }
@@ -46,37 +48,1500 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         
         #reader-container { height: calc(100vh - 80px); overflow-y: scroll; scroll-behavior: smooth; padding-bottom: 100px; }
-        
-        .ql-font-inter { font-family: 'Inter', sans-serif; }
-        .ql-font-lato { font-family: 'Lato', sans-serif; }
-        .ql-font-montserrat { font-family: 'Montserrat', sans-serif; }
-        .ql-font-roboto { font-family: 'Roboto', sans-serif; }
-        .ql-font-open_sans { font-family: 'Open Sans', sans-serif; }
-        .ql-font-merriweather { font-family: 'Merriweather', serif; }
-        .ql-font-poppins { font-family: 'Poppins', sans-serif; }
-        .ql-font-raleway { font-family: 'Raleway', sans-serif; }
-        .ql-font-source-sans-3 { font-family: 'Source Sans 3', sans-serif; }
-        .ql-font-nunito { font-family: 'Nunito', sans-serif; }
-        
-        #edit-layer .ql-toolbar { display: none !important; background-color: #f3f4f6; border-radius: 0.75rem; padding: 8px !important; margin-bottom: 1rem; border: none !important; }
-        #edit-layer .ql-editor { min-height: calc(100vh - 380px); font-size: 16px; padding: 0; }
-        /* Increase spacing between toolbar groups and buttons for clarity */
-        #edit-layer .ql-toolbar .ql-formats { display: inline-flex; gap: 14px; margin-right: 10px; }
-        #edit-layer .ql-toolbar button, #edit-layer .ql-toolbar select { margin: 0 4px; padding: 6px 8px; }
-        /* Make size select show numbers clearly and be slightly wider */
-        #edit-layer .ql-toolbar select.ql-size { min-width: 56px; }
-        
+
+        /* CKEditor 5 Decoupled Document Styling */
+        #ckeditor-toolbar-wrapper { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 20px; position: relative; z-index: 1000; }
+        #ckeditor-toolbar { flex: 1; border-radius: 14px; overflow: visible; background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(241,245,249,0.95)); border: 1px solid rgba(148,163,184,0.35); position: relative; box-shadow: 0 4px 15px rgba(15,23,42,0.08); }
+        #ckeditor-toolbar .ck-toolbar { border: none !important; background: transparent !important; padding: 10px 12px !important; flex-wrap: nowrap !important; overflow: visible !important; display: flex !important; }
+        #direction-buttons { display: flex; gap: 4px; padding: 8px 6px; background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(241,245,249,0.95)); border: 1px solid rgba(148,163,184,0.35); border-radius: 10px; flex-shrink: 0; }
+        .ck-editor-container { border: 1px solid rgba(148,163,184,0.35); border-radius: 14px; overflow: visible; box-shadow: 0 10px 30px rgba(15,23,42,0.06); background: #fff; position: relative; z-index: 1; }
+        .ck-editor-container .ck-editor__editable { min-height: 350px; font-family: 'Inter', sans-serif; font-size: 16px; padding: 18px 22px !important; border: none !important; outline: none !important; box-shadow: none !important; }
+        .ck-editor-container .ck-editor__editable:focus { border: none !important; outline: none !important; box-shadow: none !important; }
+        .ck.ck-button { border-radius: 6px !important; }
+        .ck.ck-button:hover { background: rgba(59,130,246,0.1) !important; }
+        .ck.ck-button.ck-on { background: linear-gradient(135deg, #3b82f6, #2563eb) !important; color: #fff !important; }
+        .ck.ck-dropdown__panel { border-radius: 8px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important; z-index: 99999 !important; position: absolute !important; }
+        .ck.ck-dropdown { position: relative !important; }
+        .ck-dropdown__panel.ck-dropdown__panel_se { top: 100% !important; }
+        .dark #ckeditor-toolbar { background: linear-gradient(135deg, rgba(30,41,59,0.98), rgba(51,65,85,0.95)); border-color: rgba(71,85,105,0.5); }
+        .dark #direction-buttons { background: linear-gradient(135deg, rgba(30,41,59,0.98), rgba(51,65,85,0.95)); border-color: rgba(71,85,105,0.5); }
+        .dark .ck-editor-container { background: #1e293b; border-color: rgba(71,85,105,0.5); }
+        .dark .ck-editor-container .ck-editor__editable { background: #1e293b !important; color: #e2e8f0 !important; }
+        .dark .ck.ck-toolbar { background: transparent !important; }
+        .dark .ck.ck-button { color: #e2e8f0 !important; }
+        .dark .ck.ck-icon { color: #e2e8f0 !important; }
+        .dark .ck.ck-dropdown__panel { background: #1e293b !important; }
         #read-layer { max-width: 800px; margin: 0 auto; padding: 2rem; }
         #read-layer h1 { font-size: 2.25rem; font-weight: bold; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; }
-        
-        /* ... rest of styles identical to LernMate.html ... */
+        .dark #read-layer h1 { border-bottom-color: #334155; }
     </style>
 </head>
+
 <body class="flex h-screen bg-[#FAFAFA] text-gray-900 dark:bg-dark-bg dark:text-dark-text transition-colors duration-300">
-<!-- For brevity this is the same app content as LernMate.html; use the original `LernMate.html` for editing. -->
-<div class="p-8">
-  <h1 class="text-2xl font-bold">LernMate (GitHub Pages build)</h1>
-  <p class="mt-4">This is a ready-to-publish copy of your app. Open the source `LernMate.html` to edit features; when ready push this `index.html` to a GitHub repository to publish via Pages.</p>
-</div>
+
+<!-- Sidebar -->
+<aside class="w-20 lg:w-64 bg-white dark:bg-dark-card border-r border-gray-100 dark:border-dark-border flex flex-col z-30 transition-colors duration-300">
+    <div class="h-20 flex items-center justify-center lg:justify-start lg:px-6 border-b border-transparent dark:border-dark-border">
+        <div class="w-8 h-8 bg-black dark:bg-blue-600 rounded-lg flex items-center justify-center text-white mr-0 lg:mr-3 shadow-lg shadow-blue-500/20">
+            <i class="fas fa-bolt text-sm"></i>
+        </div>
+        <span class="font-bold text-lg hidden lg:block tracking-tight">LernMate</span>
+    </div>
+    
+    <nav class="flex-1 py-6 space-y-1 px-3">
+        <button onclick="app.navigate('dashboard')" class="nav-item w-full flex items-center justify-center lg:justify-start lg:px-3 py-3 rounded-xl text-gray-500 dark:text-dark-muted hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-black dark:hover:text-white transition">
+            <i class="fas fa-home w-6 text-center"></i><span class="hidden lg:inline ml-2 text-sm font-medium">Home</span>
+        </button>
+        <button onclick="app.navigate('library')" class="nav-item w-full flex items-center justify-center lg:justify-start lg:px-3 py-3 rounded-xl text-gray-500 dark:text-dark-muted hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-black dark:hover:text-white transition">
+            <i class="fas fa-book w-6 text-center"></i><span class="hidden lg:inline ml-2 text-sm font-medium">Library</span>
+        </button>
+        <button onclick="app.navigate('vocab')" class="nav-item w-full flex items-center justify-center lg:justify-start lg:px-3 py-3 rounded-xl text-gray-500 dark:text-dark-muted hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-black dark:hover:text-white transition">
+            <i class="fas fa-layer-group w-6 text-center"></i><span class="hidden lg:inline ml-2 text-sm font-medium">Vocabulary</span>
+        </button>
+        <button onclick="app.navigate('export')" class="nav-item w-full flex items-center justify-center lg:justify-start lg:px-3 py-3 rounded-xl text-gray-500 dark:text-dark-muted hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-black dark:hover:text-white transition">
+            <i class="fas fa-file-export w-6 text-center"></i><span class="hidden lg:inline ml-2 text-sm font-medium">Export</span>
+        </button>
+        <button onclick="app.navigate('tags')" class="nav-item w-full flex items-center justify-center lg:justify-start lg:px-3 py-3 rounded-xl text-gray-500 dark:text-dark-muted hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-black dark:hover:text-white transition">
+            <i class="fas fa-hashtag w-6 text-center"></i><span class="hidden lg:inline ml-2 text-sm font-medium">Tags</span>
+        </button>
+    </nav>
+    
+    <div class="p-4 border-t border-gray-100 dark:border-dark-border space-y-2">
+        <button onclick="theme.toggle()" class="w-full flex items-center justify-center lg:justify-start p-2 text-gray-400 dark:text-dark-muted hover:text-black dark:hover:text-white transition">
+            <i class="fas fa-moon dark:hidden"></i><i class="fas fa-sun hidden dark:inline text-yellow-400"></i><span class="hidden lg:inline ml-3 text-sm">Theme</span>
+        </button>
+        <button onclick="ui.toggleSettings()" class="w-full flex items-center justify-center lg:justify-start p-2 text-gray-400 dark:text-dark-muted hover:text-black dark:hover:text-white transition">
+            <i class="fas fa-cog"></i><span class="hidden lg:inline ml-3 text-sm">Settings</span>
+        </button>
+    </div>
+</aside>
+
+<!-- Main Content -->
+<main class="flex-1 flex flex-col relative transition-colors duration-300">
+    <header class="h-20 px-8 flex items-center justify-between sticky top-0 bg-[#FAFAFA]/90 dark:bg-dark-bg/90 backdrop-blur z-20 transition-colors duration-300">
+        <div class="flex items-center">
+            <button id="btn-back-to-library" onclick="app.navigate('library')" class="hidden items-center text-gray-500 dark:text-dark-muted hover:text-black dark:hover:text-white mr-4 transition">
+                <i class="fas fa-chevron-left"></i><span class="ml-2 text-sm font-medium">Library</span>
+            </button>
+            <h2 id="page-title" class="text-xl font-bold">Dashboard</h2>
+        </div>
+        
+        <div id="mode-toggle" class="hidden bg-gray-200/50 dark:bg-gray-700/50 p-1 rounded-lg flex">
+            <button onclick="reader.setMode('read')" id="btn-read" class="px-4 py-1.5 rounded-md text-xs font-bold transition text-gray-500 dark:text-gray-400">Read</button>
+            <button onclick="reader.setMode('edit')" id="btn-edit" class="px-4 py-1.5 rounded-md text-xs font-bold transition text-gray-500 dark:text-gray-400">Edit</button>
+        </div>
+    </header>
+    
+    <div id="views-container" class="flex-1 overflow-y-auto px-4 lg:px-8 pb-8">
+        <div id="view-dashboard" class="h-full space-y-6">
+            <!-- Stat Cards Row 1 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white dark:bg-dark-card p-6 rounded-2xl border border-gray-100 dark:border-dark-border shadow-sm">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <div class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase mb-2">Total Words</div>
+                            <div class="text-4xl font-bold" id="stat-total-words">0</div>
+                        </div>
+                        <i class="fas fa-book text-2xl text-blue-500 opacity-20"></i>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-dark-card p-6 rounded-2xl border border-gray-100 dark:border-dark-border shadow-sm">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <div class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase mb-2">This Week</div>
+                            <div class="text-4xl font-bold" id="stat-week-words">0</div>
+                        </div>
+                        <i class="fas fa-fire text-2xl text-orange-500 opacity-20"></i>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-dark-card p-6 rounded-2xl border border-gray-100 dark:border-dark-border shadow-sm">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <div class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase mb-2">Current Streak</div>
+                            <div class="text-4xl font-bold" id="stat-streak">0</div>
+                            <div class="text-xs text-gray-400 mt-1">days</div>
+                        </div>
+                        <i class="fas fa-bolt text-2xl text-yellow-500 opacity-20"></i>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-dark-card p-6 rounded-2xl border border-gray-100 dark:border-dark-border shadow-sm">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <div class="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase mb-2">Avg/Week</div>
+                            <div class="text-4xl font-bold" id="stat-avg-week">0</div>
+                            <div class="text-xs text-gray-400 mt-1">words</div>
+                        </div>
+                        <i class="fas fa-chart-line text-2xl text-green-500 opacity-20"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Weekly Progress Chart -->
+                <div class="lg:col-span-2 bg-white dark:bg-dark-card p-6 rounded-2xl border border-gray-100 dark:border-dark-border shadow-sm">
+                    <h3 class="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase mb-4">Words Added (Last 7 Days)</h3>
+                    <div class="relative" style="height: 180px;">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Tag Distribution Chart -->
+                <div class="bg-white dark:bg-dark-card p-6 rounded-2xl border border-gray-100 dark:border-dark-border shadow-sm">
+                    <h3 class="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase mb-4">Words by Tag</h3>
+                    <div class="relative" style="height: 180px;">
+                        <canvas id="tagChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="view-library" class="hidden h-full">
+            <div class="flex gap-3 mb-6">
+                <button onclick="document.getElementById('file-upload').click()" class="bg-black dark:bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-800 dark:hover:bg-blue-700 transition">Import File</button>
+                <button onclick="library.createNewText()" class="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border text-gray-700 dark:text-gray-300 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-50 dark:hover:bg-gray-700 transition">Create Note</button>
+                <input type="file" id="file-upload" class="hidden" accept=".pdf,.txt" onchange="library.handleFileUpload(this)">
+            </div>
+            <div id="library-topbar" class="mb-4"></div>
+            <div id="file-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+        </div>
+        
+        <div id="view-reader" class="hidden h-full">
+            <div id="reader-container" class="bg-white dark:bg-dark-card rounded-2xl shadow-sm border border-gray-100 dark:border-dark-border mx-auto relative text-gray-900 dark:text-gray-200" style="max-width: 90%;">
+                <div id="read-layer" class="p-6"></div>
+                <div id="edit-layer" class="mx-auto p-4 md:p-6" style="display: none;">
+                    <input type="text" id="editor-title" placeholder="Note Title..." class="w-full text-2xl lg:text-3xl font-bold bg-transparent outline-none mb-4 pb-2 border-b dark:border-dark-border dark:text-white placeholder-gray-400 dark:placeholder-gray-600">
+                    <div id="ckeditor-toolbar-wrapper" style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 20px;">
+                        <div id="ckeditor-toolbar" style="flex: 1;"></div>
+                        <div id="direction-buttons">
+                            <button onclick="reader.setDirection('ltr')" class="dir-btn" data-dir="ltr" title="Left to Right" style="padding: 8px 14px; border-radius: 6px; border: none; background: #3b82f6; color: white; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.2s;">LTR</button>
+                            <button onclick="reader.setDirection('rtl')" class="dir-btn" data-dir="rtl" title="Right to Left" style="padding: 8px 14px; border-radius: 6px; border: none; background: #e2e8f0; color: #475569; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.2s;">RTL</button>
+                        </div>
+                    </div>
+                    <div id="ckeditor-container" class="ck-editor-container"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="view-vocab" class="hidden h-full">
+            <div class="mb-6 sticky top-0 z-10">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
+                    <input type="text" id="vocab-search" placeholder="Search words..." class="w-full bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-xl pl-10 pr-4 py-3 outline-none focus:border-black dark:focus:border-blue-500 transition dark:text-white" onkeyup="vocab.renderList()">
+                </div>
+            </div>
+            <div id="vocab-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20"></div>
+        </div>
+        
+        <div id="view-export" class="hidden h-full">
+            <div class="max-w-2xl mx-auto bg-white dark:bg-dark-card rounded-2xl border border-gray-100 dark:border-dark-border p-8 shadow-sm">
+                <h3 class="text-xl font-bold mb-2">Export to Anki</h3>
+                <p class="text-gray-500 dark:text-gray-400 text-sm mb-6">Select tags to include in your CSV export.</p>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xs font-bold uppercase text-gray-400">Filter Tags</span>
+                    <button onclick="exportPage.toggleAll()" class="text-xs font-bold text-blue-600 dark:text-blue-400">Select All</button>
+                </div>
+                <div id="export-tags-list" class="grid grid-cols-2 gap-3 mb-8"></div>
+                <div class="flex items-center justify-between border-t border-gray-100 dark:border-dark-border pt-6">
+                    <div class="text-sm font-medium text-gray-600 dark:text-gray-400">Selected: <span id="export-count" class="text-black dark:text-white font-bold">0</span></div>
+                    <button onclick="exportPage.generateCSV()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-xl font-bold transition text-sm">Download CSV</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="view-tags" class="hidden h-full">
+            <div class="max-w-2xl mx-auto bg-white dark:bg-dark-card rounded-2xl border border-gray-100 dark:border-dark-border p-6 mb-6">
+                <div class="flex gap-3">
+                    <input type="text" id="new-tag-name" placeholder="New Tag Name" class="flex-1 bg-gray-50 dark:bg-gray-700/50 border-0 rounded-xl px-4 py-3 outline-none dark:text-white">
+                    <input type="color" id="new-tag-color" value="#000000" class="h-12 w-12 rounded-xl border-0 cursor-pointer bg-transparent">
+                    <button onclick="tags.create()" class="bg-black dark:bg-blue-600 text-white px-6 rounded-xl font-bold text-sm">Add</button>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="tags-management-list"></div>
+        </div>
+    </div>
+    
+    <div onclick="app.toggleChat()" class="fab-chat bg-black text-white dark:bg-blue-600 dark:shadow-blue-900/40">
+        <i class="fas fa-comment-dots text-2xl"></i>
+    </div>
+    
+    <!-- Chat backdrop overlay - click to close -->
+    <div id="chat-backdrop" onclick="app.toggleChat()" class="hidden fixed inset-0 bg-transparent z-40"></div>
+    
+    <div id="chat-sidebar" class="absolute top-0 right-0 w-full md:w-[400px] h-full bg-white dark:bg-dark-card shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col border-l border-gray-100 dark:border-dark-border">
+        <div class="p-5 border-b border-gray-100 dark:border-dark-border flex justify-between items-center">
+            <h3 class="font-bold">AI Assistant</h3>
+            <button onclick="app.toggleChat()" class="text-gray-400 hover:text-red-500"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-5 space-y-4"></div>
+        <div class="p-4 border-t border-gray-100 dark:border-dark-border bg-gray-50 dark:bg-gray-900/50">
+            <div class="flex gap-2">
+                <input type="text" id="chat-input" placeholder="Ask anything..." onkeydown="if(event.key==='Enter'){event.preventDefault();ai.sendChatMessage();}" class="flex-1 bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-xl px-4 py-2 outline-none focus:border-black dark:focus:border-blue-500 dark:text-white">
+                <button onclick="ai.sendChatMessage()" class="text-black dark:text-blue-400 font-bold px-2">Send</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="word-popup" onclick="if(event.target === this) ui.closePopup()" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-dark-card rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-fade-in border border-transparent dark:border-dark-border">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 id="popup-word" class="text-2xl font-bold dark:text-white">...</h3>
+                    <button onclick="ui.closePopup()" class="text-gray-400 hover:text-black dark:hover:text-white"><i class="fas fa-times"></i></button>
+                </div>
+                <div id="popup-content" class="min-h-[100px]"></div>
+            </div>
+            <div class="p-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-dark-border">
+                <p class="text-xs font-bold text-gray-400 uppercase mb-3">Assign Tags</p>
+                <div id="popup-tags-list" class="flex flex-wrap gap-2 mb-4"></div>
+                <button onclick="vocab.saveWord()" class="w-full bg-black dark:bg-blue-600 text-white py-3 rounded-xl font-bold">Save to Vocabulary</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="edit-word-popup" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-dark-card rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-transparent dark:border-dark-border">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold dark:text-white">Edit Vocabulary</h3>
+                    <button onclick="document.getElementById('edit-word-popup').classList.add('hidden')" class="text-gray-400 hover:text-black dark:hover:text-white"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">German Word</label>
+                        <input type="text" id="edit-german-input" class="w-full bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 dark:text-white outline-none focus:border-black dark:focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Persian Meaning</label>
+                        <input type="text" id="edit-persian-input" class="w-full bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 dark:text-white outline-none focus:border-black dark:focus:border-blue-500 rtl-text">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Tags</label>
+                        <div id="edit-popup-tags-list" class="flex flex-wrap gap-2 mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-dark-border">
+                <button onclick="vocab.saveEdit()" class="w-full bg-black dark:bg-blue-600 text-white py-3 rounded-xl font-bold">Update Word</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="settings-modal" class="hidden fixed inset-0 bg-black/60 z-[70] flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-dark-card rounded-2xl p-6 w-full max-w-sm shadow-xl border border-transparent dark:border-dark-border">
+            <h3 class="text-lg font-bold mb-4 dark:text-white">Settings</h3>
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">API Key</label>
+                <div class="flex gap-2">
+                    <input type="text" id="api-key-input" class="flex-1 border dark:border-gray-600 dark:bg-gray-700/50 dark:text-white rounded-lg px-3 py-2 text-sm" placeholder="AIzaSy...">
+                    <button onclick="ai.listModels()" class="bg-gray-100 dark:bg-gray-700 px-3 rounded-lg dark:text-white"><i class="fas fa-sync"></i></button>
+                </div>
+            </div>
+            <div class="mb-6">
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Model</label>
+                <select id="model-select" class="w-full border dark:border-gray-600 dark:bg-gray-700/50 dark:text-white rounded-lg px-3 py-2 text-sm"></select>
+                <p id="model-status-text" class="text-xs mt-1 text-gray-400"></p>
+            </div>
+            
+            <div class="mb-4 border-t pt-4">
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">GitHub Gist Backup</label>
+                <p class="text-xs text-gray-400 mb-2">Use a GitHub Personal Access Token (scope: <strong>gist</strong>). Keep token private.</p>
+                <div class="mb-2">
+                    <input type="password" id="github-pat-input" class="w-full border dark:border-gray-600 dark:bg-gray-700/50 dark:text-white rounded-lg px-3 py-2 text-sm" placeholder="GitHub Personal Access Token (gist)">
+                </div>
+                <div class="mb-2">
+                    <input type="text" id="github-gist-id" class="w-full border dark:border-gray-600 dark:bg-gray-700/50 dark:text-white rounded-lg px-3 py-2 text-sm" placeholder="Existing Gist ID (optional)">
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="cloudGist.createGist(document.getElementById('github-pat-input').value)" class="px-4 py-2 text-sm bg-black dark:bg-blue-600 text-white rounded-lg">Create Gist</button>
+                    <button onclick="cloudGist.pushGist(document.getElementById('github-pat-input').value, document.getElementById('github-gist-id').value)" class="px-4 py-2 text-sm bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border text-gray-700 dark:text-gray-300 rounded-lg">Push Backup</button>
+                    <button onclick="cloudGist.pullGist(document.getElementById('github-pat-input').value, document.getElementById('github-gist-id').value)" class="px-4 py-2 text-sm bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border text-gray-700 dark:text-gray-300 rounded-lg">Pull Backup</button>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2">
+                <button onclick="ui.toggleSettings()" class="px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition">Cancel</button>
+                <button onclick="ui.saveSettings()" class="px-4 py-2 text-sm bg-black dark:bg-blue-600 text-white rounded-lg">Save</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+// --- CONFIG & STATE ---
+const DEFAULT_KEY = 'AIzaSyB8S4evq5UMHvVtkhz-UIs_U7SKSAEBEb4';
+
+let apiKey = localStorage.getItem('apiKey') || DEFAULT_KEY;
+let selectedModel = localStorage.getItem('selectedModel') || 'gemini-1.5-flash';
+
+// GitHub Gist sync (single-user) credentials
+let githubToken = localStorage.getItem('githubToken') || '';
+let githubGistId = localStorage.getItem('githubGistId') || '';
+
+// --- THEME MODULE ---
+const theme = {
+    toggle() { 
+        document.documentElement.classList.toggle('dark'); 
+        localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); 
+        this.updateChart(); 
+    },
+    init() { 
+        if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark'); 
+    },
+    updateChart() { 
+        if(app.view === 'dashboard' && window.myChart) app.renderDashboard(); 
+    }
+};
+
+// --- APP MODULE ---
+const app = {
+    view: 'dashboard',
+    files: JSON.parse(localStorage.getItem('files') || '[]'),
+    words: JSON.parse(localStorage.getItem('words') || '[]'),
+    tags: JSON.parse(localStorage.getItem('tags') || JSON.stringify([ 
+        {id: 1, name: 'Noun', color: '#ef4444'}, 
+        {id: 2, name: 'Verb', color: '#3b82f6'}, 
+        {id: 3, name: 'Adj', color: '#10b981'} 
+    ])),
+    currentFileId: null,
+
+    init() {
+        theme.init();
+        reader.initEditor();
+        reader.initEvents();
+        this.navigate('dashboard');
+        library.render();
+        if(apiKey) setTimeout(() => ai.listModels(), 1000);
+    },
+
+    navigate(view) {
+        // Always save editor content before navigating away
+        if (reader.quill && reader.mode === 'edit' && reader.currentFileId) {
+            reader.autoSaveContent();
+        }
+
+        this.view = view;
+        document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
+        document.getElementById(`view-${view}`).classList.remove('hidden');
+
+        document.querySelectorAll('.nav-item').forEach(el => {
+            el.classList.remove('bg-gray-100', 'text-black', 'dark:bg-gray-800', 'dark:text-white');
+            if (el.onclick.toString().includes(`'${view}'`)) el.classList.add('bg-gray-100', 'text-black', 'dark:bg-gray-800', 'dark:text-white');
+        });
+
+        const isReader = view === 'reader';
+        document.getElementById('mode-toggle').classList.toggle('hidden', !isReader);
+        document.getElementById('btn-back-to-library').classList.toggle('hidden', !isReader);
+        document.getElementById('btn-back-to-library').classList.toggle('flex', isReader);
+
+        const titles = {'dashboard':'Overview','library':'Library','reader':'Reader','vocab':'Vocabulary','tags':'Tags','export':'Export'};
+        document.getElementById('page-title').innerText = titles[view];
+
+        if (isReader && this.currentFileId) {
+            const file = this.files.find(f => f.id === this.currentFileId);
+            if (file) reader.loadFile(file);
+        } else if (!isReader) {
+            this.currentFileId = null;
+            reader.currentFileId = null;
+        }
+
+        if(view === 'dashboard') this.renderDashboard();
+        if(view === 'library') library.render();
+        if(view === 'tags') tags.renderManagement();
+        if(view === 'vocab') vocab.renderList();
+        if(view === 'export') exportPage.render();
+    },
+
+    toggleChat() { 
+        const sidebar = document.getElementById('chat-sidebar');
+        const backdrop = document.getElementById('chat-backdrop');
+        
+        sidebar.classList.toggle('translate-x-full');
+        
+        // Toggle backdrop visibility
+        if (backdrop) {
+            backdrop.classList.toggle('hidden');
+        }
+        
+        // Auto-focus the input when opening the chat
+        if (!sidebar.classList.contains('translate-x-full')) {
+            setTimeout(() => {
+                const chatInput = document.getElementById('chat-input');
+                if (chatInput) chatInput.focus();
+            }, 100);
+        }
+    },
+
+    save() {
+        localStorage.setItem('files', JSON.stringify(this.files));
+        localStorage.setItem('words', JSON.stringify(this.words));
+        localStorage.setItem('tags', JSON.stringify(this.tags));
+    },
+
+    renderDashboard() {
+        const now = new Date();
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        
+        // Calculate statistics
+        const totalWords = this.words.length;
+        const weekWords = this.words.filter(w => new Date(w.date) > sevenDaysAgo).length;
+        
+        // Calculate streak
+        let streak = 0;
+        for (let i = 0; i < 365; i++) {
+            const checkDate = new Date(now);
+            checkDate.setDate(checkDate.getDate() - i);
+            checkDate.setHours(0, 0, 0, 0);
+            
+            const checkDateEnd = new Date(checkDate);
+            checkDateEnd.setHours(23, 59, 59, 999);
+            
+            const hasWord = this.words.some(w => {
+                const wDate = new Date(w.date);
+                return wDate >= checkDate && wDate <= checkDateEnd;
+            });
+            
+            if (hasWord) {
+                streak++;
+            } else {
+                break;
+            }
+        }
+        
+        // Calculate average words per week (last 4 weeks)
+        const fourWeeksAgo = new Date(now.getTime() - 28 * 24 * 60 * 60 * 1000);
+        const last4WeeksWords = this.words.filter(w => new Date(w.date) > fourWeeksAgo).length;
+        const avgPerWeek = Math.round(last4WeeksWords / 4);
+        
+        // Words per day (last 7 days)
+        const wordsPerDay = [0, 0, 0, 0, 0, 0, 0];
+        const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        
+        for (let i = 0; i < 7; i++) {
+            const dayStart = new Date(now);
+            dayStart.setDate(dayStart.getDate() - (6 - i));
+            dayStart.setHours(0, 0, 0, 0);
+            
+            const dayEnd = new Date(dayStart);
+            dayEnd.setHours(23, 59, 59, 999);
+            
+            wordsPerDay[i] = this.words.filter(w => {
+                const wDate = new Date(w.date);
+                return wDate >= dayStart && wDate <= dayEnd;
+            }).length;
+        }
+        
+        // Words per tag
+        const tagStats = {};
+        this.tags.forEach(t => {
+            const count = this.words.filter(w => (w.tags || []).some(wt => wt.id === t.id)).length;
+            if (count > 0) {
+                tagStats[t.name] = {
+                    count: count,
+                    color: t.color
+                };
+            }
+        });
+        
+        // Update stat cards
+        document.getElementById('stat-total-words').innerText = totalWords;
+        document.getElementById('stat-week-words').innerText = weekWords;
+        document.getElementById('stat-streak').innerText = streak;
+        document.getElementById('stat-avg-week').innerText = avgPerWeek;
+
+        // Create line/bar chart for weekly progress
+        const ctx = document.getElementById('progressChart').getContext('2d');
+        if (window.myChart) window.myChart.destroy();
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const color = isDark ? '#3b82f6' : '#000000';
+        const bgColor = isDark ? 'rgba(59, 130, 246, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+        const gridColor = isDark ? 'rgba(148, 163, 184, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+
+        const maxY = Math.max(...wordsPerDay);
+        const suggestedMax = Math.max(maxY + 1, 5);
+
+        window.myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: dayLabels,
+                datasets: [{
+                    label: 'Words Added',
+                    data: wordsPerDay,
+                    backgroundColor: bgColor,
+                    borderColor: color,
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    barThickness: 35
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                responsive: true,
+                resizeDelay: 200,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            color: isDark ? '#94a3b8' : '#666',
+                            font: { size: 12 }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        suggestedMax: suggestedMax,
+                        ticks: {
+                            color: isDark ? '#94a3b8' : '#666',
+                            stepSize: 1,
+                            font: { size: 12 }
+                        },
+                        grid: {
+                            color: gridColor
+                        }
+                    }
+                }
+            }
+        });
+
+        // Create pie chart for tag distribution
+        const tagCtx = document.getElementById('tagChart');
+        if (!tagCtx) return; // If tag chart doesn't exist, skip
+        
+        if (window.tagChart) window.tagChart.destroy();
+
+        const tagNames = Object.keys(tagStats);
+        const tagCounts = tagNames.map(name => tagStats[name].count);
+        const tagColors = tagNames.map(name => tagStats[name].color);
+
+        if (tagNames.length > 0) {
+            window.tagChart = new Chart(tagCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: tagNames,
+                    datasets: [{
+                        data: tagCounts,
+                        backgroundColor: tagColors,
+                        borderColor: isDark ? '#1e293b' : '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    resizeDelay: 200,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: isDark ? '#d1d5db' : '#666',
+                                font: { size: 11 },
+                                padding: 12,
+                                usePointStyle: true
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+};
+
+// --- VOCAB MODULE ---
+const vocab = {
+    editingId: null,
+    renderList() {
+        const term = document.getElementById('vocab-search').value.toLowerCase();
+        const filtered = app.words.filter(w => w.german.toLowerCase().includes(term) || w.persian.includes(term));
+        document.getElementById('vocab-list').innerHTML = filtered.map(w => `<div onclick="vocab.openEdit(${w.id})" class="bg-white dark:bg-dark-card p-4 rounded-xl border border-gray-100 dark:border-dark-border hover:border-gray-300 dark:hover:border-gray-500 transition cursor-pointer group relative"><div class="flex justify-between items-start"><div><div class="font-bold text-gray-900 dark:text-white text-lg">${w.german}</div><div class="text-sm text-gray-500 dark:text-gray-400 rtl-text mb-2">${w.persian}</div></div><button onclick="event.stopPropagation(); vocab.delete(${w.id})" class="text-gray-300 hover:text-red-500 p-2"><i class="fas fa-trash"></i></button></div><div class="flex gap-1 flex-wrap mt-2">${(w.tags || []).map(t => `<span class="px-2 py-1 rounded-md text-[10px] font-bold text-white uppercase" style="background-color:${t.color}">${t.name}</span>`).join('')}</div></div>`).reverse().join('');
+    },
+    openEdit(id) {
+        this.editingId = id;
+        const word = app.words.find(w => w.id === id);
+        document.getElementById('edit-german-input').value = word.german;
+        document.getElementById('edit-persian-input').value = word.persian;
+        const modal = document.getElementById('edit-word-popup');
+        modal.classList.remove('hidden');
+        document.getElementById('edit-popup-tags-list').innerHTML = app.tags.map(t => {
+            const isSelected = (word.tags || []).some(wt => wt.id === t.id);
+            return `<button class="tag-chip px-3 py-1 rounded-lg text-xs font-bold text-white transition opacity-40 ${isSelected ? 'selected' : ''}" style="background-color:${t.color}" onclick="this.classList.toggle('selected'); this.classList.toggle('opacity-40');" data-id="${t.id}">${t.name}</button>`;
+        }).join('');
+    },
+    saveEdit() {
+        if (!this.editingId) return;
+        const word = app.words.find(w => w.id === this.editingId);
+        word.german = document.getElementById('edit-german-input').value;
+        word.persian = document.getElementById('edit-persian-input').value;
+        const selectedEls = document.querySelectorAll('#edit-popup-tags-list .tag-chip.selected');
+        word.tags = Array.from(selectedEls).map(el => app.tags.find(t => t.id == el.dataset.id));
+        app.save();
+        this.renderList();
+        document.getElementById('edit-word-popup').classList.add('hidden');
+    },
+    delete(id) {
+        event.stopPropagation();
+        if (confirm('Delete word?')) {
+            app.words = app.words.filter(w => w.id !== id);
+            app.save();
+            this.renderList();
+        }
+    },
+    saveWord() {
+        if (!ai.currentData) return;
+        const selTags = Array.from(document.querySelectorAll('#popup-tags-list .tag-chip.selected')).map(el => app.tags.find(t => t.id == el.dataset.id));
+        app.words.push({
+            id: Date.now(),
+            german: ai.currentData.word,
+            persian: ai.currentData.meaning,
+            sentence: ai.currentData.sentence_trans,
+            german_sentence: ai.currentData.german_sentence,
+            date: new Date().toISOString(),
+            tags: selTags
+        });
+        app.save();
+        ui.closePopup();
+    }
+};
+
+// --- EXPORT MODULE ---
+const exportPage = {
+    render() {
+        document.getElementById('export-tags-list').innerHTML = app.tags.map(t => `<label class="flex items-center p-3 border dark:border-dark-border rounded-xl cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"><input type="checkbox" value="${t.id}" onchange="exportPage.count()" class="w-4 h-4 text-black rounded border-gray-300 focus:ring-black"><span class="w-2 h-2 rounded-full mx-3" style="background:${t.color}"></span><span class="text-sm font-medium dark:text-gray-300">${t.name}</span></label>`).join('');
+        this.count();
+    },
+    toggleAll() {
+        document.querySelectorAll('#export-tags-list input').forEach(c => c.checked = true);
+        this.count();
+    },
+    count() {
+        const checked = Array.from(document.querySelectorAll('#export-tags-list input:checked')).map(i => parseInt(i.value));
+        const count = app.words.filter(w => (w.tags || []).some(t => checked.includes(t.id))).length;
+        document.getElementById('export-count').innerText = count;
+    },
+    generateCSV() {
+        const checked = Array.from(document.querySelectorAll('#export-tags-list input:checked')).map(i => parseInt(i.value));
+        const wordsToExport = app.words.filter(w => (w.tags || []).some(t => checked.includes(t.id)));
+        if (wordsToExport.length === 0) return alert('No words selected.');
+
+        let csvContent = '\uFEFF';
+        wordsToExport.forEach(w => {
+            const clean = (text) => (text || '').replace(/"/g, '""').replace(/(\r\n|\n|\r)/gm, " ");
+            const row = [clean(w.german), clean(w.persian), clean(w.german_sentence), clean(w.sentence)];
+            csvContent += '"' + row.join('","') + '"\n';
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `lernmate_export_${Date.now()}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+};
+
+// --- TAGS MODULE ---
+const tags = {
+    create() {
+        const n = document.getElementById('new-tag-name').value;
+        const c = document.getElementById('new-tag-color').value;
+        if (n) {
+            app.tags.push({ id: Date.now(), name: n, color: c });
+            app.save();
+            this.renderManagement();
+        }
+    },
+    renderManagement() {
+        document.getElementById('tags-management-list').innerHTML = app.tags.map(t => `<div class="p-4 border dark:border-dark-border rounded-xl flex justify-between items-center bg-white dark:bg-dark-card"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:${t.color}"></span><span class="dark:text-gray-200">${t.name}</span></div><button onclick="tags.delete(${t.id})"><i class="fas fa-trash text-gray-300 hover:text-red-500"></i></button></div>`).join('');
+    },
+    delete(id) {
+        app.tags = app.tags.filter(t => t.id !== id);
+        app.save();
+        this.renderManagement();
+    }
+};
+
+// --- AI MODULE ---
+const ai = {
+    currentData: null,
+    async listModels() {
+        const sel = document.getElementById('model-select');
+        const key = document.getElementById('api-key-input').value || apiKey;
+        sel.innerHTML = '<option>Fetching...</option>';
+        try {
+            const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+            const d = await r.json();
+            if (d.error) throw new Error(d.error.message);
+            const models = d.models.filter(m => m.supportedGenerationMethods.includes('generateContent'));
+            sel.innerHTML = models.map(m => `<option value="${m.name.replace('models/', '')}">${m.displayName}</option>`).join('');
+            sel.value = selectedModel;
+            if (!sel.value && models.length) {
+                selectedModel = models[0].name.replace('models/', '');
+                sel.value = selectedModel;
+                localStorage.setItem('selectedModel', selectedModel);
+            }
+            document.getElementById('model-status-text').innerText = 'Connected';
+        } catch (e) {
+            sel.innerHTML = '<option>Error</option>';
+            document.getElementById('model-status-text').innerText = e.message;
+        }
+    },
+    async analyze(word, sentence) {
+        ui.openPopup(word);
+        const p = `برای کلمه آلمانی "${word}" که در این جمله آمده: "${sentence}"، یک آبجکت JSON دقیق با مقادیر فارسی بده.\nقوانین مهم:\n1. در فیلد 'word'، شکل اصلی و پایه کلمه را برگردان. اگر فعل است، مصدر (infinitive) آن را بیاب. اگر اسم جمع است، شکل مفرد (singular) آن را پیدا کن. برای افعال جداشدنی (trennbar)، حتما شکل کامل و مصدری فعل را پیدا کن.\n2. تمام مقادیر داخل JSON باید به زبان فارسی باشند، به جز فیلدهای 'word' و 'gender'.\nفرمت JSON خروجی باید اینطور باشد:\n{"word": "(شکل اصلی و پایه کلمه به آلمانی)", "meaning": "(معنی فارسی)", "type": "(نوع کلمه: اسم، فعل...)", "gender": "(جنسیت اگر اسم است: Der, Die, Das)", "sentence_trans": "(ترجمه فارسی جمله)", "expl": "(توضیح کوتاه به فارسی)"}`;
+        try {
+            const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: p }] }] })
+            });
+            const d = await r.json();
+            this.currentData = JSON.parse(d.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim());
+            this.currentData.german_sentence = sentence;
+            ui.updatePopup(this.currentData);
+        } catch (e) {
+            document.getElementById('popup-content').innerHTML = 'Error';
+            console.error(e);
+        }
+    },
+    async sendChatMessage() {
+        const i = document.getElementById('chat-input');
+        const q = i.value;
+        if (!q) return;
+
+        const c = document.getElementById('chat-messages');
+        c.innerHTML += `<div class="bg-black dark:bg-blue-600 text-white p-3 rounded-xl ml-auto text-sm w-fit max-w-[80%]">${q}</div>`;
+        i.value = '';
+        c.scrollTop = c.scrollHeight;
+
+        try {
+            const currentFile = app.files.find(f => f.id === app.currentFileId);
+            const documentContext = currentFile && app.view === 'reader' ? ` Document Information: File Name: ${currentFile.name}, Content: ${currentFile.content || 'No content available'}` : '';
+            const fullPrompt = q + documentContext;
+
+            const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: fullPrompt }] }] })
+            });
+
+            const d = await r.json();
+            c.innerHTML += `<div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-xl mr-auto text-sm w-fit max-w-[90%] rtl-text dark:text-gray-200">${marked.parse(d.candidates[0].content.parts[0].text)}</div>`;
+        } catch (e) {
+            c.innerHTML += `<div class="bg-red-100 dark:bg-red-900 p-3 rounded-xl text-red-700 dark:text-red-200 text-sm">خطا در دریافت پاسخ</div>`;
+        }
+        c.scrollTop = c.scrollHeight;
+    }
+};
+
+// --- GITHUB GIST BACKUP ---
+const cloudGist = {
+    // Create a new private gist with current backup content
+    async createGist(token) {
+        if (!token) return alert('Please set your GitHub Personal Access Token (scope: gist) in Settings.');
+        try {
+            const payload = {
+                description: 'LernMate backup',
+                public: false,
+                files: {
+                    'lernmate_backup.json': { content: JSON.stringify({ files: app.files, words: app.words, tags: app.tags, date: new Date().toISOString() }, null, 2) }
+                }
+            };
+            const r = await fetch('https://api.github.com/gists', {
+                method: 'POST',
+                headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const d = await r.json();
+            if (!r.ok) throw new Error(d.message || 'Failed to create gist');
+            githubGistId = d.id;
+            localStorage.setItem('githubGistId', githubGistId);
+            alert('Gist created: ' + (d.html_url || d.id));
+        } catch (e) {
+            console.error('Create gist error:', e);
+            alert('Create gist failed: ' + (e.message || e));
+        }
+    },
+
+    // Push current state into an existing gist (create if missing)
+    async pushGist(token, gistId) {
+        if (!token) return alert('Please set your GitHub Personal Access Token (scope: gist) in Settings.');
+        const id = gistId || githubGistId;
+        if (!id) return alert('No Gist ID set. Create a gist first.');
+        try {
+            const content = JSON.stringify({ files: app.files, words: app.words, tags: app.tags, date: new Date().toISOString() }, null, 2);
+            const payload = { files: { 'lernmate_backup.json': { content } } };
+            const r = await fetch('https://api.github.com/gists/' + id, {
+                method: 'PATCH',
+                headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const d = await r.json();
+            if (!r.ok) throw new Error(d.message || 'Failed to update gist');
+            alert('Backup pushed to Gist');
+        } catch (e) {
+            console.error('Push gist error:', e);
+            alert('Push failed: ' + (e.message || e));
+        }
+    },
+
+    // Pull backup from an existing gist and restore into the app
+    async pullGist(token, gistId) {
+        try {
+            const id = gistId || githubGistId;
+            if (!id) return alert('No Gist ID specified.');
+            const headers = token ? { 'Authorization': 'token ' + token } : {};
+            const r = await fetch('https://api.github.com/gists/' + id, { headers });
+            const d = await r.json();
+            if (!r.ok) throw new Error(d.message || 'Failed to fetch gist');
+            // Prefer our filename, or take first file
+            const fileObj = d.files['lernmate_backup.json'] || Object.values(d.files)[0];
+            if (!fileObj || !fileObj.content) throw new Error('Gist does not contain backup file');
+            const content = JSON.parse(fileObj.content);
+            if (content) {
+                app.files = content.files || [];
+                app.words = content.words || [];
+                app.tags = content.tags || [];
+                app.save();
+                if (app.view === 'library') library.render();
+                vocab.renderList();
+                app.renderDashboard();
+                alert('Backup restored from Gist');
+            }
+        } catch (e) {
+            console.error('Pull gist error:', e);
+            alert('Pull failed: ' + (e.message || e));
+        }
+    }
+};
+
+
+// --- UI MODULE ---
+const ui = {
+    toggleSettings() {
+        document.getElementById('settings-modal').classList.toggle('hidden');
+        document.getElementById('api-key-input').value = apiKey;
+        document.getElementById('github-pat-input').value = githubToken;
+        document.getElementById('github-gist-id').value = githubGistId;
+        ai.listModels();
+    },
+    saveSettings() {
+        apiKey = document.getElementById('api-key-input').value;
+        selectedModel = document.getElementById('model-select').value;
+        githubToken = document.getElementById('github-pat-input').value || '';
+        githubGistId = document.getElementById('github-gist-id').value || '';
+        localStorage.setItem('githubToken', githubToken);
+        localStorage.setItem('githubGistId', githubGistId);
+        localStorage.setItem('apiKey', apiKey);
+        localStorage.setItem('selectedModel', selectedModel);
+        
+        document.getElementById('settings-modal').classList.add('hidden');
+    },
+    openPopup(w) {
+        document.getElementById('word-popup').classList.remove('hidden');
+        document.getElementById('popup-word').innerText = w;
+        document.getElementById('popup-content').innerHTML = '<div class="flex justify-center py-8"><div class="loader"></div></div>';
+        document.getElementById('popup-tags-list').innerHTML = app.tags.map(t => `<button class="tag-chip px-3 py-1 rounded-full text-xs font-bold text-white opacity-30 hover:opacity-100" style="background:${t.color}" onclick="this.classList.toggle('selected');this.classList.toggle('opacity-30');" data-id="${t.id}">${t.name}</button>`).join('');
+    },
+    closePopup() {
+        document.getElementById('word-popup').classList.add('hidden');
+    },
+    updatePopup(d) {
+        document.getElementById('popup-word').innerText = d.word;
+        document.getElementById('popup-content').innerHTML = `<div class="rtl-text space-y-3 dark:text-gray-200"><div class="text-xl font-bold">${d.meaning}</div><div class="flex gap-2 text-xs font-bold uppercase"><span class="bg-gray-100 dark:bg-gray-700 p-1 rounded">${d.type}</span><span class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 p-1 rounded">${d.gender || ''}</span></div><div class="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded text-sm space-y-2"><p class="text-gray-600 dark:text-gray-400" style="direction: ltr; text-align: left;">${d.german_sentence}</p><p>${d.sentence_trans}</p></div><div class="text-xs text-gray-400">${d.expl}</div></div>`;
+    }
+};
+
+// --- READER MODULE ---
+const reader = {
+    mode: 'read',
+    editor: null,
+    currentFileId: null,
+
+    initEditor() {
+        if (this.editor) return;
+        
+        DecoupledEditor
+            .create(document.querySelector('#ckeditor-container'), {
+                toolbar: [
+                    'heading', 'fontFamily', 'fontSize', '|',
+                    'bold', 'italic', 'underline', '|',
+                    'fontColor', 'fontBackgroundColor', '|',
+                    'alignment', 'bulletedList', 'numberedList', '|',
+                    'link', 'imageUpload', 'blockQuote', 'undo', 'redo'
+                ],
+                fontFamily: {
+                    options: [
+                        'default',
+                        'Inter, sans-serif',
+                        'Poppins, sans-serif',
+                        'Montserrat, sans-serif',
+                        'Lato, sans-serif',
+                        'Roboto, sans-serif',
+                        'Open Sans, sans-serif',
+                        'DM Sans, sans-serif',
+                        'Space Grotesk, sans-serif',
+                        'Outfit, sans-serif',
+                        'Sora, sans-serif',
+                        'Manrope, sans-serif',
+                        'Plus Jakarta Sans, sans-serif',
+                        'Playfair Display, serif',
+                        'Vazirmatn, sans-serif'
+                    ],
+                    supportAllValues: true
+                },
+                fontSize: {
+                    options: [10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48],
+                    supportAllValues: true
+                },
+                image: {
+                    upload: {
+                        types: ['jpeg', 'png', 'gif', 'bmp', 'webp', 'tiff']
+                    }
+                },
+                language: 'en',
+                placeholder: 'Start writing...'
+            })
+            .then(editor => {
+                this.editor = editor;
+                
+                // Insert toolbar into container
+                const toolbarContainer = document.querySelector('#ckeditor-toolbar');
+                toolbarContainer.innerHTML = '';
+                toolbarContainer.appendChild(editor.ui.view.toolbar.element);
+                
+                // Auto-save on content change
+                let saveTimeout;
+                editor.model.document.on('change:data', () => {
+                    clearTimeout(saveTimeout);
+                    saveTimeout = setTimeout(() => {
+                        this.saveCurrentFile();
+                    }, 500);
+                });
+                
+                console.log('CKEditor Decoupled initialized');
+            })
+            .catch(error => {
+                console.error('CKEditor init error:', error);
+            });
+    },
+
+    setDirection(dir) {
+        if (!this.editor) return;
+        
+        const editable = document.querySelector('.ck-editor__editable');
+        if (editable) {
+            editable.style.direction = dir;
+            editable.style.textAlign = dir === 'rtl' ? 'right' : 'left';
+        }
+        
+        // Update button states
+        document.querySelectorAll('.dir-btn').forEach(btn => {
+            if (btn.dataset.dir === dir) {
+                btn.style.background = '#3b82f6';
+                btn.style.color = 'white';
+            } else {
+                btn.style.background = '#e2e8f0';
+                btn.style.color = '#475569';
+            }
+        });
+    },
+
+    saveCurrentFile() {
+        if (!this.editor || !this.currentFileId) return;
+        
+        const file = app.files.find(f => f.id === this.currentFileId);
+        if (!file || file.type !== 'text') return;
+
+        // Get content from CKEditor
+        const content = this.editor.getData();
+        console.log('Saving file content:', content);
+        
+        // Save content
+        file.content = content;
+        
+        // Save title
+        const titleInput = document.getElementById('editor-title');
+        if (titleInput) {
+            file.title = titleInput.value.trim();
+        }
+        
+        file.lastEdited = Date.now();
+        app.save();
+    },
+
+    loadFile(file) {
+        console.log('Loading file:', file.id, file.name);
+        
+        this.currentFileId = file.id;
+        app.currentFileId = file.id;
+        
+        document.getElementById('page-title').innerText = file.title || file.name || '';
+
+        // Always start in read mode
+        this.setMode('read');
+    },
+
+    setMode(m) {
+        console.log('setMode called:', m);
+        
+        const readLayer = document.getElementById('read-layer');
+        const editLayer = document.getElementById('edit-layer');
+        const btnRead = document.getElementById('btn-read');
+        const btnEdit = document.getElementById('btn-edit');
+
+        const file = app.files.find(f => f.id === this.currentFileId);
+        if (!file) {
+            console.log('No file found for id:', this.currentFileId);
+            return;
+        }
+
+        // Reset button styles
+        btnRead.className = btnEdit.className = "px-4 py-1.5 rounded-md text-xs font-bold transition text-gray-500 dark:text-gray-400";
+
+        if (m === 'read') {
+            // If coming from edit mode, save first
+            if (this.mode === 'edit' && this.editor) {
+                this.saveCurrentFile();
+            }
+            
+            this.mode = 'read';
+            btnRead.classList.add('bg-white', 'dark:bg-gray-700', 'shadow-sm');
+
+            // Display content in read layer
+            const title = file.title || '';
+            const content = file.content || '';
+            
+            console.log('Displaying in read mode - title:', title, 'content:', content);
+            
+            readLayer.innerHTML = (title ? `<h1 class="text-2xl font-bold mb-4 pb-2 border-b">${title}</h1>` : '') + content;
+            
+            document.getElementById('page-title').innerText = title || file.name || '';
+            
+            editLayer.style.display = 'none';
+            readLayer.style.display = 'block';
+            
+        } else {
+            // Edit mode
+            this.mode = 'edit';
+            btnEdit.classList.add('bg-white', 'dark:bg-gray-700', 'shadow-sm');
+
+            // Set title
+            document.getElementById('editor-title').value = file.title || '';
+
+            // Set CKEditor content
+            if (this.editor) {
+                const content = file.content || '';
+                this.editor.setData(content);
+                console.log('Loaded into CKEditor:', content);
+            }
+
+            readLayer.style.display = 'none';
+            editLayer.style.display = 'block';
+            
+            // Focus editor
+            setTimeout(() => {
+                if (this.editor) this.editor.focus();
+            }, 100);
+        }
+    },
+
+    initEvents() {
+        // Double-click for AI analysis in read mode
+        setTimeout(() => {
+            const readerContainer = document.getElementById('reader-container');
+            if (!readerContainer) return;
+            
+            readerContainer.addEventListener('dblclick', (e) => {
+                if (this.mode !== 'read') return;
+                if (e.target.closest('#edit-layer')) return;
+
+                const selection = window.getSelection();
+                const selectedText = selection.toString().trim();
+
+                if (!selectedText || selectedText.length < 2) return;
+                if (selectedText.split(' ').length > 1) return;
+
+                let sentence = '';
+                if (selection.anchorNode) {
+                    // Find nearest text-holding block element
+                    let element = selection.anchorNode.nodeType === 3 
+                        ? selection.anchorNode.parentElement 
+                        : selection.anchorNode;
+
+                    while (element) {
+                        if (element.matches && element.matches('p, div, li, h1, h2, h3, h4, h5, h6, span')) {
+                            const blockText = element.textContent || '';
+                            const range = selection.getRangeAt(0);
+
+                            // Compute character index of selection start within the block
+                            const preRange = document.createRange();
+                            preRange.setStart(element, 0);
+                            preRange.setEnd(range.startContainer, range.startOffset);
+                            const startIndex = preRange.toString().length;
+
+                            const dotBefore = blockText.lastIndexOf('.', startIndex);
+                            const dotAfter = blockText.indexOf('.', startIndex + selectedText.length);
+
+                            const sentenceStart = dotBefore === -1 ? 0 : dotBefore + 1;
+                            const sentenceEnd = dotAfter === -1 ? blockText.length : dotAfter + 1;
+
+                            sentence = blockText.slice(sentenceStart, sentenceEnd).trim();
+                            break;
+                        }
+                        element = element.parentElement;
+                    }
+                }
+
+                if (sentence && sentence.trim()) {
+                    ai.analyze(selectedText, sentence.trim());
+                }
+            });
+        }, 200);
+    }
+};
+
+// --- LIBRARY MODULE ---
+const library = {
+    selectedFiles: new Set(),
+    sortBy: localStorage.getItem('librarySortBy') || 'name', // 'name', 'created', 'edited'
+
+    handleFileUpload(i) {
+        const f = i.files[0];
+        if(!f) return;
+
+        const r = new FileReader();
+        r.onload = (e) => {
+            app.files.push({
+                id: Date.now().toString(),
+                name: f.name,
+                type: f.name.endsWith('.pdf') ? 'pdf' : 'text',
+                content: e.target.result
+            });
+            app.save();
+            this.render();
+        };
+
+        f.name.endsWith('.pdf') ? r.readAsDataURL(f) : r.readAsText(f);
+    },
+
+    createNewText() {
+        let fileName = "Untitled Note";
+        let isValid = false;
+        
+        while (!isValid) {
+            fileName = prompt("نام فایل را وارد کنید:", fileName);
+            
+            if (!fileName || fileName.trim() === "") {
+                return; // User cancelled
+            }
+            
+            const trimmedName = fileName.trim();
+            
+            // Check if filename already exists
+            const fileExists = app.files.some(f => f.name.toLowerCase() === trimmedName.toLowerCase());
+            if (fileExists) {
+                alert("این نام فایل قبلاً وجود دارد. لطفاً از نام دیگری استفاده کنید.");
+                fileName = trimmedName; // Keep the entered name for next prompt
+            } else {
+                isValid = true;
+                
+                const newFile = {
+                    id: Date.now().toString(),
+                    name: trimmedName,  // File name
+                    title: '',              // Title starts empty - user sets it in editor
+                    type: 'text',
+                    content: ''             // Empty content
+                };
+
+                app.files.push(newFile);
+                app.save();
+                this.render();
+                
+                // Open the file immediately in reader
+                reader.currentFileId = newFile.id;
+                app.currentFileId = newFile.id;
+                app.navigate('reader');
+                
+                // Wait for reader to be initialized, then go to edit mode
+                setTimeout(() => {
+                    reader.loadFile(newFile);
+                    setTimeout(() => {
+                        reader.setMode('edit');
+                    }, 50);
+                }, 100);
+            }
+        }
+    },
+
+    toggleSelect(id, event) {
+        event.stopPropagation();
+        if (this.selectedFiles.has(id)) {
+            this.selectedFiles.delete(id);
+        } else {
+            this.selectedFiles.add(id);
+        }
+        this.render();
+    },
+
+    selectAll() {
+        if (this.selectedFiles.size === app.files.length) {
+            this.selectedFiles.clear();
+        } else {
+            this.selectedFiles.clear();
+            app.files.forEach(f => this.selectedFiles.add(f.id));
+        }
+        this.render();
+    },
+
+    setSortBy(value) {
+        this.sortBy = value;
+        localStorage.setItem('librarySortBy', value);
+        this.render();
+    },
+
+    downloadFile(id, event) {
+        event.stopPropagation();
+        const file = app.files.find(f => f.id === id);
+        if (!file) return;
+
+        // For text files, download as plain text
+        if (file.type === 'text') {
+            // Extract title (prefer explicit title, otherwise try leading H1 in content)
+            const html = file.content || '';
+            let title = file.title && file.title.trim() ? file.title.trim() : '';
+            let bodyHtml = html;
+            if (!title) {
+                const m = html.match(/^\s*<h1[^>]*>([\s\S]*?)<\/h1>/i);
+                if (m) {
+                    title = m[1].trim();
+                    bodyHtml = bodyHtml.replace(/^\s*<h1[^>]*>[\s\S]*?<\/h1>/i, '');
+                }
+            } else {
+                // if title provided, remove leading H1 if it duplicates the title
+                bodyHtml = bodyHtml.replace(/^\s*<h1[^>]*>[\s\S]*?<\/h1>/i, '');
+            }
+
+            // Convert HTML body to plain text
+            const bodyText = bodyHtml.replace(/<[^>]*>/g, '').trim();
+
+            // Compose file content: first line is title (if any), then blank line, then body
+            const finalText = (title ? title + "\n\n" : '') + bodyText;
+
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(finalText));
+            element.setAttribute('download', file.name.endsWith('.txt') ? file.name : file.name + '.txt');
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+        // For PDFs, download directly
+        else if (file.type === 'pdf') {
+            const element = document.createElement('a');
+            element.setAttribute('href', file.content);
+            element.setAttribute('download', file.name);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+    },
+
+    bulkDownload() {
+        if (this.selectedFiles.size === 0) {
+            alert('Please select files to download');
+            return;
+        }
+
+        // If only one file, download it directly
+        if (this.selectedFiles.size === 1) {
+            const id = Array.from(this.selectedFiles)[0];
+            const event = { stopPropagation: () => {} };
+            this.downloadFile(id, event);
+            this.selectedFiles.clear();
+            this.render();
+            return;
+        }
+
+        // For multiple files, create a zip-like text format
+        let allContent = '';
+        const selectedIds = Array.from(this.selectedFiles);
+        selectedIds.forEach((id, index) => {
+            const file = app.files.find(f => f.id === id);
+            if (file && file.type === 'text') {
+                const html = file.content || '';
+                let title = file.title && file.title.trim() ? file.title.trim() : '';
+                let bodyHtml = html;
+                if (!title) {
+                    const m = html.match(/^\s*<h1[^>]*>([\s\S]*?)<\/h1>/i);
+                    if (m) {
+                        title = m[1].trim();
+                        bodyHtml = bodyHtml.replace(/^\s*<h1[^>]*>[\s\S]*?<\/h1>/i, '');
+                    }
+                } else {
+                    bodyHtml = bodyHtml.replace(/^\s*<h1[^>]*>[\s\S]*?<\/h1>/i, '');
+                }
+
+                const bodyText = bodyHtml.replace(/<[^>]*>/g, '').trim();
+                const fileBlock = `${title ? title + "\n\n" : ''}${bodyText}`;
+                allContent += `\n\n${'='.repeat(50)}\n${file.name}\n${'='.repeat(50)}\n\n${fileBlock}`;
+            }
+        });
+
+        const element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(allContent));
+        element.setAttribute('download', 'LernMate_Export_' + Date.now() + '.txt');
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+
+        this.selectedFiles.clear();
+        this.render();
+    },
+
+    bulkDelete() {
+        if (this.selectedFiles.size === 0) {
+            alert('Please select files to delete');
+            return;
+        }
+
+        if (confirm(`Delete ${this.selectedFiles.size} file(s)?`)) {
+            const selectedIds = Array.from(this.selectedFiles);
+            selectedIds.forEach(id => {
+                if (app.currentFileId === id) {
+                    app.navigate('library');
+                }
+                app.files = app.files.filter(f => f.id !== id);
+            });
+            app.save();
+            this.selectedFiles.clear();
+            this.render();
+        }
+    },
+
+    render() {
+        // Top bar: Select All + bulk actions (persistent above the list)
+        const hasFiles = app.files.length > 0;
+        const allSelected = hasFiles && this.selectedFiles.size === app.files.length;
+
+        const topBar = `
+            <div class="mb-4 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 bg-white dark:bg-dark-card rounded-lg border dark:border-dark-border p-3">
+                        ${hasFiles ? `<input type="checkbox" id="select-all-checkbox" ${allSelected ? 'checked' : ''} onchange="library.selectAll()" class="w-4 h-4 cursor-pointer">` : ''}
+                        ${hasFiles ? `<label for="select-all-checkbox" class="cursor-pointer text-gray-700 dark:text-gray-300">Select All</label>` : `<span class="text-gray-500 dark:text-gray-400">No files</span>`}
+                        <span class="text-sm text-gray-600 dark:text-gray-300 ml-2">${this.selectedFiles.size > 0 ? this.selectedFiles.size + ' selected' : ''}</span>
+                    </div>
+                    ${this.selectedFiles.size > 0 ? `<button onclick="library.bulkDownload()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"><i class="fas fa-download mr-2"></i>Download</button>` : ''}
+                    ${this.selectedFiles.size > 0 ? `<button onclick="library.bulkDelete()" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"><i class="fas fa-trash mr-2"></i>Delete</button>` : ''}
+                    ${this.selectedFiles.size > 0 ? `<button onclick="library.selectedFiles.clear(); library.render()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"><i class="fas fa-times mr-2"></i>Cancel</button>` : ''}
+                </div>
+                <div class="flex items-center gap-3">
+                    ${hasFiles ? `
+                    <div class="flex items-center gap-2 bg-white dark:bg-dark-card border dark:border-dark-border px-3 py-2.5 rounded-lg">
+                        <i class="fas fa-arrow-down-wide-short text-gray-500 dark:text-gray-400"></i>
+                        <select onchange="library.setSortBy(this.value)" class="text-sm bg-transparent border-none outline-none dark:text-gray-300 cursor-pointer">
+                            <option value="name" ${this.sortBy === 'name' ? 'selected' : ''}>Name</option>
+                            <option value="created" ${this.sortBy === 'created' ? 'selected' : ''}>Date Created</option>
+                            <option value="edited" ${this.sortBy === 'edited' ? 'selected' : ''}>Last Edited</option>
+                        </select>
+                    </div>` : ''}
+                </div>
+            </div>
+        `;
+
+        // Sort files based on sortBy
+        let sortedFiles = [...app.files];
+        if (this.sortBy === 'name') {
+            sortedFiles.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+        } else if (this.sortBy === 'created') {
+            sortedFiles.sort((a, b) => parseInt(b.id) - parseInt(a.id)); // Newer first
+        } else if (this.sortBy === 'edited') {
+            sortedFiles.sort((a, b) => (b.lastEdited || parseInt(b.id)) - (a.lastEdited || parseInt(a.id))); // Recently edited first
+        }
+
+        // File cards
+        const listHtml = sortedFiles.map(f => `
+            <div class="bg-white dark:bg-dark-card p-5 rounded-xl border dark:border-dark-border hover:border-black dark:hover:border-blue-500 cursor-pointer group relative ${this.selectedFiles.has(f.id) ? 'ring-2 ring-blue-500' : ''}">
+                <div class="absolute left-4 top-4">
+                    <input type="checkbox" ${this.selectedFiles.has(f.id) ? 'checked' : ''} onchange="library.toggleSelect('${f.id}', event)" class="w-4 h-4 cursor-pointer">
+                </div>
+                <div onclick="app.currentFileId='${f.id}'; app.navigate('reader');" class="flex-1 ml-8">
+                    <div class="font-bold dark:text-white truncate pr-16">${f.name}</div>
+                    <div class="text-xs text-gray-400 mt-1 uppercase">${f.type}</div>
+                </div>
+                <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 flex gap-2">
+                    <button onclick="library.downloadFile('${f.id}', event)" class="text-gray-400 hover:text-green-500 transition" title="Download"><i class="fas fa-download"></i></button>
+                    <button onclick="library.rename('${f.id}', event)" class="text-gray-400 hover:text-blue-500 transition" title="Rename"><i class="fas fa-pencil-alt"></i></button>
+                    <button onclick="library.delete('${f.id}', event)" class="text-gray-400 hover:text-red-500 transition" title="Delete"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `).join('');
+
+        document.getElementById('library-topbar').innerHTML = topBar;
+        document.getElementById('file-list').innerHTML = listHtml;
+    },
+
+    rename(id, event) {
+        event.stopPropagation();
+        const file = app.files.find(f => f.id === id);
+        if (!file) return;
+
+        let newName = file.name;
+        let isValid = false;
+        
+        while (!isValid) {
+            newName = prompt("Enter new name for the file:", newName);
+            
+            if (!newName || newName.trim() === "") {
+                return; // User cancelled
+            }
+            
+            const trimmedName = newName.trim();
+            
+            // Check if filename already exists (excluding current file)
+            const fileExists = app.files.some(f => f.id !== id && f.name.toLowerCase() === trimmedName.toLowerCase());
+            if (fileExists) {
+                alert("این نام فایل قبلاً وجود دارد. لطفاً از نام دیگری استفاده کنید.");
+                newName = trimmedName; // Keep the entered name for next prompt
+            } else {
+                isValid = true;
+                file.name = trimmedName;
+                app.save();
+                this.render();
+
+                if (app.currentFileId === id) {
+                     document.getElementById('page-title').innerText = (file.title && file.title.trim()) ? file.title : '';
+                    if (reader.mode === 'edit') document.getElementById('editor-title').value = file.title || '';
+                }
+            }
+        }
+    },
+
+    delete(id, event) {
+        event.stopPropagation();
+        if(confirm('Delete this file?')) {
+            if(app.currentFileId === id) {
+                app.navigate('library');
+            }
+            app.files = app.files.filter(f => f.id !== id);
+            app.save();
+            this.render();
+        }
+    }
+};
+
+window.onload = () => {
+    app.init();
+};
+</script>
+
 </body>
 </html>
