@@ -1,73 +1,31 @@
-# Welcome to your Lovable project
+LernMate — GitHub Pages publish
 
-## Project info
+This folder contains a Pages-ready copy of your web app.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+What I added
+- `index.html` — a publishable copy of your app (use `LernMate.html` as the editable source).
+- `.github/workflows/pages.yml` — GitHub Actions workflow that packages the repository and deploys to GitHub Pages automatically when you push to `main`.
 
-## How can I edit this code?
+How to publish (quick):
+1. Create a new repository on GitHub (or use an existing one).
+2. From your local folder, push files to the repository:
 
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```bash
+git init
+git add .
+git commit -m "Initial LernMate Pages site"
+git branch -M main
+# replace <USER> and <REPO> with your GitHub username and repo name
+git remote add origin https://github.com/<USER>/<REPO>.git
+git push -u origin main
 ```
 
-**Edit a file directly in GitHub**
+3. After push, GitHub Actions will run the `pages.yml` workflow and deploy the site. Visit `https://<USER>.github.io/<REPO>/` after a minute or two.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Notes & security
+- Do NOT hard-code any secrets (PATs) into files that go into the repo. Your app stores the GitHub PAT in `localStorage` only.
+- If you want continuous publishing from edits to `LernMate.html`, keep editing locally, then copy the updated HTML into `index.html` and push.
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+If you want, I can:
+- Prepare a small script to sync `LernMate.html` -> `index.html` automatically.
+- Help create the GitHub repo for you if you provide a token (I will not store it). 

@@ -1,7 +1,0 @@
-project_id = "fpbjbtgpfcfnjmoopfos"
-
-[functions.google-drive]
-verify_jwt = true
-
-[functions.translate]
-verify_jwt = true
