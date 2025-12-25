@@ -210,12 +210,12 @@
         </div>
         
         <div id="view-reader" class="hidden h-full">
-            <div id="reader-container" class="bg-white dark:bg-dark-card rounded-2xl shadow-sm border border-gray-100 dark:border-dark-border mx-auto max-w-4xl relative text-gray-900 dark:text-gray-200">
+            <div id="reader-container" class="bg-white dark:bg-dark-card rounded-2xl shadow-sm border border-gray-100 dark:border-dark-border mx-auto relative text-gray-900 dark:text-gray-200" style="max-width: 90%;">
                 <div id="read-layer" class="p-6"></div>
-                <div id="edit-layer" class="max-w-3xl mx-auto p-4 md:p-6" style="display: none;">
+                <div id="edit-layer" class="mx-auto p-4 md:p-6" style="display: none;">
                     <input type="text" id="editor-title" placeholder="Note Title..." class="w-full text-2xl lg:text-3xl font-bold bg-transparent outline-none mb-4 pb-2 border-b dark:border-dark-border dark:text-white placeholder-gray-400 dark:placeholder-gray-600">
-                    <div id="ckeditor-toolbar-wrapper">
-                        <div id="ckeditor-toolbar"></div>
+                    <div id="ckeditor-toolbar-wrapper" style="display: flex; align-items: flex-end; gap: 8px; margin-bottom: 20px;">
+                        <div id="ckeditor-toolbar" style="flex: 1;"></div>
                         <div id="direction-buttons">
                             <button onclick="reader.setDirection('ltr')" class="dir-btn" data-dir="ltr" title="Left to Right" style="padding: 8px 14px; border-radius: 6px; border: none; background: #3b82f6; color: white; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.2s;">LTR</button>
                             <button onclick="reader.setDirection('rtl')" class="dir-btn" data-dir="rtl" title="Right to Left" style="padding: 8px 14px; border-radius: 6px; border: none; background: #e2e8f0; color: #475569; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.2s;">RTL</button>
@@ -973,7 +973,7 @@ const reader = {
                     'bold', 'italic', 'underline', '|',
                     'fontColor', 'fontBackgroundColor', '|',
                     'alignment', 'bulletedList', 'numberedList', '|',
-                    'link', 'blockQuote', 'undo', 'redo'
+                    'link', 'imageUpload', 'blockQuote', 'undo', 'redo'
                 ],
                 fontFamily: {
                     options: [
@@ -998,6 +998,11 @@ const reader = {
                 fontSize: {
                     options: [10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48],
                     supportAllValues: true
+                },
+                image: {
+                    upload: {
+                        types: ['jpeg', 'png', 'gif', 'bmp', 'webp', 'tiff']
+                    }
                 },
                 language: 'en',
                 placeholder: 'Start writing...'
